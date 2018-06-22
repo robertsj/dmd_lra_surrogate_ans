@@ -1,3 +1,8 @@
+"""
+This script is a driver for the LRA benchmark problem.  Currently,
+the LRA problem is built into Detran.  
+"""
+
 from detran import *
 
 from lra_mesh import *
