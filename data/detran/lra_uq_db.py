@@ -37,22 +37,22 @@ def get_input() :
   db.put_str("pc_type",                         "jacobi");
   db.put_str("petsc_pc_type",                   "lu");
   db.put_int("petsc_pc_factor_levels",          3);
-  db.put_str("eigen_solver_type",               "power");
+  db.put_str("eigen_solver_type",               "gd");
   db.put_int("eigen_solver_maxit",              1000);
   db.put_int("eigen_solver_monitor_level",      1);
-  db.put_dbl("eigen_solver_tol",                1.0e-12)
+  db.put_dbl("eigen_solver_tol",                1.0e-9)
   inp.put_spdb("inner_solver_db", db)
   inp.put_spdb("inner_pc_db", db)
   inp.put_spdb("outer_solver_db", db) 
   inp.put_spdb("eigen_solver_db", db)
   inp.put_int("ts_max_steps",                   10000)
-  inp.put_int("ts_scheme",                      Time2D.BDF2)
+  inp.put_int("ts_scheme",                      Time2D.IMP)
   inp.put_int("ts_output",                      0)
-  inp.put_dbl("ts_step_size",                   0.01)
+  inp.put_dbl("ts_step_size",                   0.001)
   inp.put_dbl("ts_final_time",                  3.0)
   #inp.put_int("ts_no_extrapolation",            1)
   inp.put_int("ts_max_iters",                   10)
-  inp.put_dbl("ts_tolerance",                   1.0e-8)
+  inp.put_dbl("ts_tolerance",                   1.0e-5)
   #
   preconditioner_db = utilities.InputDB.Create("preconditioner_db")
   preconditioner_db.put_dbl("linear_solver_atol",              0.0);
