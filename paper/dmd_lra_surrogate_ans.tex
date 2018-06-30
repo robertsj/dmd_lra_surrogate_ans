@@ -24,6 +24,9 @@ Department of Mechanical \& Nuclear Engineering, Kansas State University, Manhat
 \newcommand{\ud}{\mathop{}\!\mathrm{d}} % upright derivative symbol
 \DeclareMathOperator*{\argmin}{argmin}
 
+\graphicspath{{../data/images/}}
+
+
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
@@ -111,7 +114,16 @@ TODO: add equations for the algorithm.
 %TODO: motivate need for time windowing and illustrate basic methodology.
 
 %Maybe ``partitioned DMD''?  
-DMD has major pitfalls, one is that the dynamic modes are non-orthogonal, and hence increasing the number of modes does not always enhance the the prediction as the added non-orthogonal mode might not be adding useful information but rather removing some information from the previous modes that might be vital for the system. That is why all the comparisons held between DMD and POD stated that the optimal number of dynamic modes in DMD is usually very few and as the number of modes is increased the prediction precision might reach an unacceptable threshold \cite{DMDvsPOD}. Although this is an undesirable quality that requires careful analysis to pick the proper rank, it is a motivation for the proposed idea. Second, is the statement declared by many scientists about possible deficiency of DMD to capture transient effects. And the reason for that is that for fast transient, the space spanned by the snapshots is rapidly changing and deviating in a rather short time increments. This motivated the idea of partitioned DMD. If our dynamics can be broken into portions where the time scales within each portion are comparable, but are very different from other portions. And/or if the first time trajectory had an intrinsic DMD rank that is different than the second portion/trajectory, that is the case where all the basis coming from the snapshots (and hence a full rank surrogate) in an interval are needed in the interval with the most aggressive and rapid dynamical change, whereas we do not need that before and after that time period. Those cases motivated the inspection of the partitioned DMD surrogate where the whole analysis time is broken into partitions, each of which is dealt with separately, to construct a DMD surrogate. This allows to pick different ranks for each interval and also to pick the appropriate dynamic mode scaling, since this performs differently with how slow/fast are your dynamics, which means that the interval with slow dynamics might use Eq.~\ref{eq:bOpt}, whereas for other intervals, the original initial condition projected on the DMD modes (i.e., $\vec{b}={\boldsymbol{\Phi}^{DMD\dagger}} \vec{y_0}$) might be sufficient.
+DMD has major pitfalls, one is that the dynamic modes are non-orthogonal, and hence increasing the number of modes does not always enhance the the prediction as the added non-orthogonal mode might not be adding useful information but rather removing some information from the previous modes that might be vital for the system. 
+That is why all the comparisons held between DMD and POD stated that the optimal number of dynamic modes in DMD is usually very few and as the number of modes is increased the prediction precision might reach an unacceptable threshold \cite{DMDvsPOD}. 
+Although this is an undesirable quality that requires careful analysis to pick the proper rank, it is a motivation for the proposed idea. 
+Second, is the statement declared by many scientists about possible deficiency of DMD to capture transient effects. 
+And the reason for that is that for fast transient, the space spanned by the snapshots is rapidly changing and deviating in a rather short time increments. 
+This motivated the idea of partitioned DMD. 
+If our dynamics can be broken into portions where the time scales within each portion are comparable, but are very different from other portions. 
+And/or if the first time trajectory had an intrinsic DMD rank that is different than the second portion/trajectory, that is the case where all the basis coming from the snapshots (and hence a full rank surrogate) in an interval are needed in the interval with the most aggressive and rapid dynamical change, whereas we do not need that before and after that time period. 
+Those cases motivated the inspection of the partitioned DMD surrogate where the whole analysis time is broken into partitions, each of which is dealt with separately, to construct a DMD surrogate. 
+This allows to pick different ranks for each interval and also to pick the appropriate dynamic mode scaling, since this performs differently with how slow/fast are your dynamics, which means that the interval with slow dynamics might use Eq.~\ref{eq:bOpt}, whereas for other intervals, the original initial condition projected on the DMD modes (i.e., $\vec{b}={\boldsymbol{\Phi}^{DMD\dagger}} \vec{y_0}$) might be sufficient.
 
 
 \section{LRA Benchmark}
@@ -122,9 +134,10 @@ DMD has major pitfalls, one is that the dynamic modes are non-orthogonal, and he
 The two-dimensional, two-group diffusion LRA benchmark problem is a simplified, quarter-core, BWR model subject to a control-rod ejection with adiabatic heating.
 Although complete details can be found elsewhere \cite{}, the basic assembly layout is shown in Fig.~\ref{fig:lra_core}.
 To produce the time-dependent snapshots of Eq.~({eq:xxx}), the determinstic transport code {\tt Detran} \cite{} was used to solve the time-dependent diffusion equations.  
-A mesh-centered, finite-volume discretization was used with a 1 cm mesh throughout.
-A second-order, backward-difference temporal discretization was used with a fixed 0.001 s step size.  
+A mesh-centered, finite-volume discretization was used with a 7.5 cm mesh throughout.
+A second-order, backward-difference temporal discretization was used with a fixed 0.01 s step size.  
 The solution at each time step was converged using fixed-point iteration.
+The discretization used is far from numerically converged, but it produces a sufficiently rich set of data for demonstration.
 
 \begin{figure}
 \begin{tikzpicture}[scale=.4]
@@ -199,8 +212,8 @@ The solution at each time step was converged using fixed-point iteration.
 \label{fig:lra_core}
 \end{figure}
 
-The initial condition for the transient was computed by solving the steady-state equations, for which the $k_{\text{eff}}$ was found to be 0.9974, consistent with previously reported results.
-The transient was executed up to XXX seconds.
+The initial condition for the transient was computed by solving the steady-state equations, for which the $k_{\text{eff}}$ was found to be 0.9975.
+The transient was executed up to 3 seconds.
 The space and time discretization employed results in a local (fine-mesh) power distribution of $X \times X$ values recorded at Y times.
 
 
@@ -209,6 +222,15 @@ The space and time discretization employed results in a local (fine-mesh) power 
 The partioned DMD algorithm
 
 All DMD surrogates were constructed in Python using modification of {\tt PyDMD} \cite{}.
+
+
+\begin{figure*}[t!]
+ \centering
+ \includegraphics[width=\textwidth]{corepower}\\
+   \caption{Left and center: reference and approximate core power density; right: corresponding absolute, relative error.}
+  \label{fig:corepower}
+\end{figure*}
+
 
 \section{Conclusions}
 
