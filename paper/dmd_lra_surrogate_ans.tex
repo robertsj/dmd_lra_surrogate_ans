@@ -148,8 +148,8 @@ The discretization used is far from numerically converged, but it produces a suf
   \draw[step=1.5cm,gray,very thin, dashed,opacity=0.4] (0, 0) grid (16.5,16.5);
 
 % AXES
-  \draw[black, thick, ->] (0, 0) -- (17,  0) node[right] {$x$};
-  \draw[black, thick, ->] (0, 0) -- ( 0, 17) node[above] {$y$};
+  \draw[black, thick, ->] (0, 0) -- (17,  0) node[right] {$x$ (cm)};
+  \draw[black, thick, ->] (0, 0) -- ( 0, 17) node[above] {$y$ (cm)};
 
 % Material 1 regions 
 
@@ -194,7 +194,7 @@ The discretization used is far from numerically converged, but it produces a suf
  
 % Perturbed regions
   \def\eps{0.125}
-%   \draw[black, thick, dashed] (10.5\eps, 7.5\eps) -- (10.5\eps, 10.5-\eps) -- (13.5-\eps, 10.5-\eps) -- (13.5-\eps, 7.5\eps) --  (10.5\eps, 7.5\eps);
+  \draw[black, thick, dashed] (10.5+\eps, 7.5+\eps) -- (10.5+\eps, 10.5-\eps) -- (13.5-\eps, 10.5-\eps) -- (13.5-\eps, 7.5+\eps) --  (10.5+\eps, 7.5+\eps);
 
   %\draw[black, thick] ( 12,  12) -- (10.5,  12);
   %\draw[black, thick] (10.5, 10.5) -- ( 12, 10.5);
