@@ -347,3 +347,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# datafiles from matlab .mat and for python pickles .p
+*.p
+*.mat`

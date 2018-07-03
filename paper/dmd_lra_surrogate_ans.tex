@@ -85,7 +85,7 @@ and
 where $m$ is the number of samples (often called snapshots).  
 Then
 \begin{equation}
-  \vec{y_{k+1}}=\mathbf{A}\vec{y_{k}}, \quad k = 0, 1, \ldots \, ,
+  \vec{y_{k1}}=\mathbf{A}\vec{y_{k}}, \quad k = 0, 1, \ldots \, ,
 \label{eq:snapshot_prop}
 \end{equation}
 where $\mathbf{A}=\exp(\mathcal{A}\Delta t)$.  
@@ -106,11 +106,13 @@ The procedure is summarized in Algorithm \ref{algDMD}, in which $\vec{b}$ is the
 
 TODO: add equations for the algorithm.
 
-\subsection{Multi-Batch DMD}
+\subsection{Partitioned DMD}
 
-TODO: motivate need for time windowing and illustrate basic methodology.
+%TODO: motivate need for time windowing and illustrate basic methodology.
 
-Maybe ``partitioned DMD''?  
+%Maybe ``partitioned DMD''?  
+DMD has major pitfalls, one is that the dynamic modes are non-orthogonal, and hence increasing the number of modes does not always enhance the the prediction as the added non-orthogonal mode might not be adding useful information but rather removing some information from the previous modes that might be vital for the system. That is why all the comparisons held between DMD and POD stated that the optimal number of dynamic modes in DMD is usually very few and as the number of modes is increased the prediction precision might reach an unacceptable threshold \cite{DMDvsPOD}. Although this is an undesirable quality that requires careful analysis to pick the proper rank, it is a motivation for the proposed idea. Second, is the statement declared by many scientists about possible deficiency of DMD to capture transient effects. And the reason for that is that for fast transient, the space spanned by the snapshots is rapidly changing and deviating in a rather short time increments. This motivated the idea of partitioned DMD. If our dynamics can be broken into portions where the time scales within each portion are comparable, but are very different from other portions. And/or if the first time trajectory had an intrinsic DMD rank that is different than the second portion/trajectory, that is the case where all the basis coming from the snapshots (and hence a full rank surrogate) in an interval are needed in the interval with the most aggressive and rapid dynamical change, whereas we do not need that before and after that time period. Those cases motivated the inspection of the partitioned DMD surrogate where the whole analysis time is broken into partitions, each of which is dealt with separately, to construct a DMD surrogate. This allows to pick different ranks for each interval and also to pick the appropriate dynamic mode scaling, since this performs differently with how slow/fast are your dynamics, which means that the interval with slow dynamics might use Eq.~\ref{eq:bOpt}, whereas for other intervals, the original initial condition projected on the DMD modes (i.e., $\vec{b}={\boldsymbol{\Phi}^{DMD\dagger}} \vec{y_0}$) might be sufficient.
+
 
 \section{LRA Benchmark}
 \label{sec:application}
@@ -127,7 +129,7 @@ The solution at each time step was converged using fixed-point iteration.
 \begin{figure}
 \begin{tikzpicture}[scale=.4]
 
-\begin{scope}<+->;
+\begin{scope}<->;
 
 % GRID
   \draw[step=1.5cm,gray,very thin, dashed,opacity=0.4] (0, 0) grid (16.5,16.5);
@@ -179,7 +181,8 @@ The solution at each time step was converged using fixed-point iteration.
  
 % Perturbed regions
   \def\eps{0.125}
-  \draw[black, thick, dashed] (10.5+\eps, 7.5+\eps) -- (10.5+\eps, 10.5-\eps) -- (13.5-\eps, 10.5-\eps) -- (13.5-\eps, 7.5+\eps) --  (10.5+\eps, 7.5+\eps);
+%   \draw[black, thick, dashed] (10.5\eps, 7.5\eps) -- (10.5\eps, 10.5-\eps) -- (13.5-\eps, 10.5-\eps) -- (13.5-\eps, 7.5\eps) --  (10.5\eps, 7.5\eps);
+
   %\draw[black, thick] ( 12,  12) -- (10.5,  12);
   %\draw[black, thick] (10.5, 10.5) -- ( 12, 10.5);
   %\draw[black, thick] (10.5, 10.5) -- (10.5,  12);
@@ -221,4 +224,3 @@ The material presented is based on work supported in part by the U.S. Nuclear Re
 \bibliographystyle{ans}
 \bibliography{bibliography}
 \end{document}
-
