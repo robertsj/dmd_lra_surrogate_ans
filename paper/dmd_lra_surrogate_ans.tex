@@ -37,10 +37,10 @@ Hence, relatively  inexpensive surrogate models may be needed.
 
 Given access to a high-fidelity model and corresponding solution, data-driven techniques can be used to generate surrogates without resorting to simplified physics or modifying the underlying implementation.  
 One class of surrogates recently explored in the nuclear engineering community are those based on dynamic-mode decomposition.  
-These past applications involved spatiotemporal dynamics that evolved relatively slowly in time, e.g., the evolution of isotopics \cite{} and decay-heat generation \cite{}.
+These past applications involved spatiotemporal dynamics that evolved relatively slowly in time, e.g., the evolution of isotopics \cite{abdo2018data, elzohery2018cbg} and decay-heat generation \cite{alfonsi2018dhc}.
 
 Reactor transients exhibit much different dynamics.
-With the restart of TREAT, preliminary efforts to apply generate surrogates based on gPC for uncertainty quantification have had some success \cite{}.
+With the restart of TREAT, preliminary efforts to apply surrogates based on generalized polynomial chaos (gPC) for uncertainty quantification have had some success \cite{wang2017usa}.
 However, the surrogates generated lacked explicit time dependence and required substantial user development.
 
 Presented here is the development of a data-driven surrogate based on dynamic-mode decomposition (DMD) to approximate time- and space-dependent fluxes and powers.
@@ -48,15 +48,15 @@ Specifically, a surrogate was produced for the 2-D LRA transient diffusion bench
 Whereas a conventional DMD surrogate cannot capture the rapid dynamics of the LRA transient, a composite surrogate constructed from a sequence of DMD surrogates defined for successive time windows proved more effective, the details of which are presented below.
 
 
-\section{Dynamic Mode Decomposition}
+\section{Theory}
 \label{sec:backgound}
 
 Interest in DMD has grown over the past decade for its ability to represent complex models with explicit temporal dynamics based on observed data alone.  
-The basic algorithm was first proposed in the fluid-dynamics community by Schmid for the analysis of experimental data \cite{schmid:hal-01053394, schmid2010dynamic} but was swiftly developed by others in a variety of fields as has been thorougly detailed in the recent monograph by Kutz {\it et al.} \cite{kutzbook}.
+The basic algorithm was first proposed in the fluid-dynamics community by Schmid for the analysis of experimental data \cite{schmid2010dynamic} but was swiftly developed by others in a variety of fields as has been thorougly detailed in the recent monograph by Kutz {\it et al.} \cite{kutz2016dynamic}.
 Underlying the utility of DMD is its strong connection to Koopman theory and the Koopman operator, a linear, infinite-dimensional operator that acts on finite measurements of a nonlinear, dynamical system.
 In other words, the Koopman operator provides the machinery to describe the evolution of observations of a nonlinear system in time, and DMD provides a finite-dimensional approximation to this operator.
 
-\subsection{Conventional DMD} 
+\subsection{Dynamic Mode Decomposition} 
 
 To motivate DMD, first consider the generic, dynamic problem defined by
 \begin{equation}
@@ -71,24 +71,22 @@ Suppose that the evolution of $\vec{y}$ can be well approximated by a relationsh
 where the operator $\mathcal{A}$ may not be known explicitly. 
 Suppose further that the quantities of interest are sampled at several times and organized as vector of a matrix, i.e.,
 \begin{equation}
-\mathbf{Y_0}=\left[\begin{array}{cccc}
-| & | &   & | \\ 
-{\vec{y_0}} &  {\vec{y_1}} & ... & {\vec{y_{m-1}}} \\ 
-| & | &  & |
-\end{array} \right]\, ,
-\end{equation}
-and
-\begin{equation}
-{\mathbf{Y_1}}=\left[\begin{array}{cccc}
-| & | &  & | \\ 
-{\vec{y_1}} &  {\vec{y_2}} & ... & {\vec{y_{m}}} \\ 
-| & | &  & |
-\end{array} \right] \, .
+\mathbf{Y_0}=\left[\begin{array}{ccc}
+| & |   & | \\
+{\vec{y_0}} &   ... & {\vec{y_{m-1}}} \\ 
+| & | &  | 
+\end{array} \right] 
+ \,\, \text{and} \quad
+{\mathbf{Y_1}}=\left[\begin{array}{ccc}
+| & |  & | \\ 
+{\vec{y_1}} & ... & {\vec{y_{m}}} \\ 
+| & |  & |
+\end{array} \right] \, ,
 \end{equation}
 where $m$ is the number of samples (often called snapshots).  
 Then
 \begin{equation}
-  \vec{y_{k1}}=\mathbf{A}\vec{y_{k}}, \quad k = 0, 1, \ldots \, ,
+  \mathbf{y_{k+1}}=\mathbf{A}\mathbf{y_{k}}, \quad k = 0, 1, \ldots \, ,
 \label{eq:snapshot_prop}
 \end{equation}
 where $\mathbf{A}=\exp(\mathcal{A}\Delta t)$.  
@@ -97,43 +95,55 @@ In general, no such operator $\mathbf{A}$ exists such that Eq.~(\ref{eq:snapshot
 \label{eq:AOpt}
     \mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{Y_{1}} -\mathbf{AY_{1}}\|_F \, ,
 \end{equation}
-the solution of which is the pseudoinverse $\mathbf{A}=\mathbf{Y_1}\mathbf{{{Y}_{0}}^{\dagger}}$.
+the solution of which is $\mathbf{A}=\mathbf{Y_1}\mathbf{{{Y}_{0}}^{\dagger}}$, where $\dagger$ indicates the pseudoinverse.
 However, this matrix is large, and rather than compute it explicitly, the DMD exploits the low-rank approximation
 \begin{equation}
-\mathbf{\tilde{A}} = \mathbf{U_r^{H}AU_r} \, .
+\mathbf{\tilde{A}} = \mathbf{U_r^{*}AU_r} \, .
 \end{equation}
-Here, $\mathbf{U}_r$ aggregates the first $r$ columns of the left singular matrix resulting from the Singular Value Decomposition $ {\mathbf{A = U\Sigma V^T}}$, while $ \mathbf{U_r^{H}}$ is the Hermitian conjugate of $\mathbf{U}_r$.
-The leading $r$ eigenvalues of $\mathcal{A}$ are inferred from the eigenvalues of $\mathbf{\tilde{A}}$. 
-Once computed, the eigenvalues $\lambda_i$ of the discrete operator $\mathbf{A}$ can be transformed to the continuous frequencies $w_i$'s via $w_i=\log(\lambda_i)/\Delta t$.
-The procedure is summarized in Algorithm \ref{algDMD}, in which $\vec{b}$ is the amplitude vector computed to satisfy the initial condition in the DMD basis (i.e., $\vec{b}={\boldsymbol{\Phi}^{DMD\dagger}} \vec{y_1}$).
+where $\mathbf{U}_r$ aggregates the first $r$  left singular vectors of $\mathbf{A}$.  Then the eigendomposition
+\begin{equation}
+ \mathbf{\tilde{A}}\mathbf{W} = \mathbf{W}\bm{\lambda} \, ,
+\end{equation}
+approximates the leading $r$ eigenvalues of $\mathbf{A}$ with corresponding 
+eigenvectors (often called DMD modes)
+\begin{equation}
+ \bm{\Phi} = \mathbf{U}_r \mathbf{W} \, .
+\end{equation}
+Each eigenvalue $\lambda_i$ of $\mathbf{A}$ can be transformed to the continuous frequency $w_i=\log(\lambda_i)/\Delta t$.
+Finally, the resulting surrogate is
+\begin{equation}
+ \mathbf{y}(t) \approx \sum^r_{i=1} \bm{\phi}_i e^{\omega_i t} b_i \, ,
+\end{equation}
+where the elements of $\mathbf{b}$ are amplitudes of the initial condition in the modal representation.  A typical definition is 
+the least-squares representation $\mathbf{b}=\bm{\Phi}^{\dagger} \mathbf{y}_0$.  However, more complicated definitions have been proposed to optimize the representation of the surrogate across all snapshots \cite{jovanovic2014sparsity} and have been employed to support the present effort.
 
-TODO: add equations for the algorithm.
+%The procedure is summarized in Algorithm \ref{algDMD}, in which $\vec{b}$ is the amplitude vector computed to satisfy the initial condition in the DMD basis (i.e., $\vec{b}={\boldsymbol{\Phi}^{DMD\dagger}} \vec{y_1}$).
+
+%TODO: add equations for the algorithm.
 
 \subsection{Partitioned DMD}
 
 %TODO: motivate need for time windowing and illustrate basic methodology.
 
 %Maybe ``partitioned DMD''?  
-DMD has major pitfalls, one is that the dynamic modes are non-orthogonal, and hence increasing the number of modes does not always enhance the the prediction as the added non-orthogonal mode might not be adding useful information but rather removing some information from the previous modes that might be vital for the system. 
-That is why all the comparisons held between DMD and POD stated that the optimal number of dynamic modes in DMD is usually very few and as the number of modes is increased the prediction precision might reach an unacceptable threshold \cite{DMDvsPOD}. 
-Although this is an undesirable quality that requires careful analysis to pick the proper rank, it is a motivation for the proposed idea. 
-Second, is the statement declared by many scientists about possible deficiency of DMD to capture transient effects. 
-And the reason for that is that for fast transient, the space spanned by the snapshots is rapidly changing and deviating in a rather short time increments. 
-This motivated the idea of partitioned DMD. 
-If our dynamics can be broken into portions where the time scales within each portion are comparable, but are very different from other portions. 
-And/or if the first time trajectory had an intrinsic DMD rank that is different than the second portion/trajectory, that is the case where all the basis coming from the snapshots (and hence a full rank surrogate) in an interval are needed in the interval with the most aggressive and rapid dynamical change, whereas we do not need that before and after that time period. 
-Those cases motivated the inspection of the partitioned DMD surrogate where the whole analysis time is broken into partitions, each of which is dealt with separately, to construct a DMD surrogate. 
-This allows to pick different ranks for each interval and also to pick the appropriate dynamic mode scaling, since this performs differently with how slow/fast are your dynamics, which means that the interval with slow dynamics might use Eq.~\ref{eq:bOpt}, whereas for other intervals, the original initial condition projected on the DMD modes (i.e., $\vec{b}={\boldsymbol{\Phi}^{DMD\dagger}} \vec{y_0}$) might be sufficient.
+A drawback of DMD is that its modes are non-orthogonal, and hence, increasing the number of modes does not always improve the the prediction because the addition of modes can remove information introduced by previous modes.
+Moreover, DMD is known to perform poorly for systems with rapid dynamics.  
+Consequently, a simple scheme was explored to improve DMD analysis of rapid dynamics.
 
+Suppose the dynamics of a system can be partitioned into intervals of time in which characteristic time scales are comparable.
+Then, DMD can be applied independently within each interval, with ranks selected according to the number of snapshots in the interval and the corresponding dynamics represented by those snapshots.
+Identification of partition times can be informed by these underlying dynamics, perhaps as quantified by a mean or integral quantity. 
+As an example, it was found for the present work that the the core power provided useful guidance.
+It is expected that heuristics might exist based on similar, integral in other applications, and that the process of selecting intervals might easily be integrated into an optimization scheme that determines an appropriate threshold value.
 
-\section{LRA Benchmark}
+\section{Results and Analysis}
 \label{sec:application}
 
-% Describe the numerical specific of LRA, the perturbations used, and why they are of interest.
+\subsection{LRA Benchmark}
 
 The two-dimensional, two-group diffusion LRA benchmark problem is a simplified, quarter-core, BWR model subject to a control-rod ejection with adiabatic heating.
-Although complete details can be found elsewhere \cite{}, the basic assembly layout is shown in Fig.~\ref{fig:lra_core}.
-To produce the time-dependent snapshots of Eq.~({eq:xxx}), the determinstic transport code {\tt Detran} \cite{} was used to solve the time-dependent diffusion equations.  
+Although complete details can be found elsewhere \cite{anl}, the basic assembly layout is shown in Fig.~\ref{fig:lra_core}.
+To produce time-dependent snapshots, the determinstic transport code Detran\footnote{https://github.com/robertsj/libdetran} was used to solve the time-dependent diffusion equations.  
 A mesh-centered, finite-volume discretization was used with a 7.5 cm mesh throughout.
 A second-order, backward-difference temporal discretization was used with a fixed 0.01 s step size.  
 The solution at each time step was converged using fixed-point iteration.
@@ -219,9 +229,9 @@ The space and time discretization employed results in a local (fine-mesh) power 
 
 \section{Surrogate Generation and Performance}
 
-The partioned DMD algorithm
-
-All DMD surrogates were constructed in Python using modification of {\tt PyDMD} \cite{}.
+Snapshots of the mesh-dependent power were extracted from the Detran solution and used as input for the DMD analysis. All DMD analysis presented was performed using modifications of {\tt PyDMD} \cite{demo2018pydmd}.
+ 
+By inspection, it was found that isolation of the transient peak power within a small time interval led naturally to a set of three, partioned DMD surrogates separated at $t = 1.36$ and $t = 1.5$ seconds.  The ranks used in each interval were 10, 13, and 40, each found by an iterative search to minimize the Frobenius norm of the surrogate error in each of the intervals.  Optimized amplitudes (elements of $\mathbf{b}$) were used for the first interval following Ref.~\cite{jovanovic2014sparsity}, while standard projection for the initial condition (i.e., $\mathbf{b}=\bm{\Phi}^{\dagger} \mathbf{y}_0$) was used for the second and third intervals.    The core power density and corresponding absolute, relative error are shown as a function of time in Fig.~\ref{fig:corepower}.  The core power was computed directly from the mesh powers. In addition, mesh powers are shown for $t=0$, $t=1.43$, and $t=2.00$ seconds (i.e., the intial distribution along with the distributions at each peaks) in Fig.~\ref{fig:meshpower}.  
 
 
 \begin{figure*}[t!]
@@ -230,6 +240,18 @@ All DMD surrogates were constructed in Python using modification of {\tt PyDMD} 
    \caption{Left and center: reference and approximate core power density; right: corresponding absolute, relative error.}
   \label{fig:corepower}
 \end{figure*}
+
+\begin{figure*}[t!]
+ \centering
+ \includegraphics[width=\textwidth]{meshpower}\\
+   \caption{Left and center: reference and approximate mesh-wise powers (W); right: corresponding absolute, relative error.}
+  \label{fig:meshpower}
+\end{figure*}
+
+The surrogate developed reproduces core power with a maximum error of approximately 10\% and much lower errors during the first peak.  The better approximation during the first peak can be attributed at least in part to the smaller time interval.  However, as observed in Fig.~\ref{fig:meshpower}, errors in the mesh powers are very small at the transient peak time of 1.43 s, which suggests the spatiotemporal dynamics through the transient peak are well approximated by a relatively small number of modes.  Errors in power distribution at $t = 0$ and $t = 2$ s are larger.
+
+
+Though promising, the quality of the approximation proved to be very sensitive to the time intervals, ranks, and amplited vector $\mathbf{b}$ used.  As extreme examples, the removal of just one mode in the second interval increased errors in mesh powers at $t = 1.43$ s from approximately $10^{-7}$ \% to 2.5\%, while the addition of one mode in the third interval led to a solution that grew exponentially in time, a clear indication that the mode added removed important information from the space spanned by the original 40 modes.  These are  significant sensitivities that must be addressed as part of future work, especially if the DMD surrogates are to play a role in quantification of uncertainty.
 
 
 \section{Conclusions}
@@ -240,7 +262,7 @@ Work is ongoing to mitigate this sensitivity and to provide an automated way to 
 
 \section{Acknowledgments}
 
-The material presented is based on work supported in part by the U.S. Nuclear Regulatory Commission, Office of Nuclear Regulatory Research, under award number NRC-HQ-60-15-G-0004.
+The material presented is based on work supported in part by a U.S. NRC Faculty Develoment Grant. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ans}

@@ -196,5 +196,5 @@ def run(num_samples, option) :
 
 if __name__ == "__main__":
     solvers.Manager.initialize(sys.argv)
-    run(num_samples=50, option=0)
+    run(num_samples=1, option=-1)
     solvers.Manager.finalize()
