@@ -86,14 +86,14 @@ Suppose further that the quantities of interest are sampled at several times and
 where $m$ is the number of samples (often called snapshots).  
 Then
 \begin{equation}
-  \mathbf{y_{k+1}}=\mathbf{A}\mathbf{y_{k}}, \quad k = 0, 1, \ldots \, ,
+  \mathbf{y_{k+1}}=\mathbf{A}\mathbf{y_{k}}, \quad k = 0, 1, \ldots \, ,m-1
 \label{eq:snapshot_prop}
 \end{equation}
 where $\mathbf{A}=\exp(\mathcal{A}\Delta t)$.  
 In general, no such operator $\mathbf{A}$ exists such that Eq.~(\ref{eq:snapshot_prop}) is satisfied, and instead, the relation is approximately satisfied by defining
 \begin{equation}
 \label{eq:AOpt}
-    \mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{Y_{1}} -\mathbf{AY_{1}}\|_F \, ,
+    \mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{Y_{1}} -\mathbf{AY_{0}}\|_F \, ,
 \end{equation}
 the solution of which is $\mathbf{A}=\mathbf{Y_1}\mathbf{{{Y}_{0}}^{\dagger}}$, where $\dagger$ indicates the pseudoinverse.
 However, this matrix is large, and rather than compute it explicitly, the DMD exploits the low-rank approximation
@@ -102,7 +102,7 @@ However, this matrix is large, and rather than compute it explicitly, the DMD ex
 \end{equation}
 where $\mathbf{U}_r$ aggregates the first $r$  left singular vectors of $\mathbf{A}$.  Then the eigendomposition
 \begin{equation}
- \mathbf{\tilde{A}}\mathbf{W} = \mathbf{W}\bm{\lambda} \, ,
+ \mathbf{\tilde{A}}\mathbf{W} = \mathbf{W}\bm{\Lambda} \, ,
 \end{equation}
 approximates the leading $r$ eigenvalues of $\mathbf{A}$ with corresponding 
 eigenvectors (often called DMD modes)
