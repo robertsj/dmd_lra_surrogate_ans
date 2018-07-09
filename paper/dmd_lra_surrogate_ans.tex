@@ -86,14 +86,14 @@ Suppose further that the quantities of interest are sampled at several times and
 where $m$ is the number of samples (often called snapshots).  
 Then
 \begin{equation}
-  \mathbf{y_{k+1}}=\mathbf{A}\mathbf{y_{k}}, \quad k = 0, 1, \ldots \, ,
+  \mathbf{y_{k+1}}=\mathbf{A}\mathbf{y_{k}}, \quad k = 0, 1, \ldots \, ,m-1
 \label{eq:snapshot_prop}
 \end{equation}
 where $\mathbf{A}=\exp(\mathcal{A}\Delta t)$.  
 In general, no such operator $\mathbf{A}$ exists such that Eq.~(\ref{eq:snapshot_prop}) is satisfied, and instead, the relation is approximately satisfied by defining
 \begin{equation}
 \label{eq:AOpt}
-    \mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{Y_{1}} -\mathbf{AY_{1}}\|_F \, ,
+    \mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{Y_{1}} -\mathbf{AY_{0}}\|_F \, ,
 \end{equation}
 the solution of which is $\mathbf{A}=\mathbf{Y_1}\mathbf{{{Y}_{0}}^{\dagger}}$, where $\dagger$ indicates the pseudoinverse.
 However, this matrix is large, and rather than compute it explicitly, the DMD exploits the low-rank approximation
@@ -102,7 +102,7 @@ However, this matrix is large, and rather than compute it explicitly, the DMD ex
 \end{equation}
 where $\mathbf{U}_r$ aggregates the first $r$  left singular vectors of $\mathbf{A}$.  Then the eigendomposition
 \begin{equation}
- \mathbf{\tilde{A}}\mathbf{W} = \mathbf{W}\bm{\lambda} \, ,
+ \mathbf{\tilde{A}}\mathbf{W} = \mathbf{W}\bm{\Lambda} \, ,
 \end{equation}
 approximates the leading $r$ eigenvalues of $\mathbf{A}$ with corresponding 
 eigenvectors (often called DMD modes)
@@ -133,7 +133,7 @@ Consequently, a simple scheme was explored to improve DMD analysis of rapid dyna
 Suppose the dynamics of a system can be partitioned into intervals of time in which characteristic time scales are comparable.
 Then, DMD can be applied independently within each interval, with ranks selected according to the number of snapshots in the interval and the corresponding dynamics represented by those snapshots.
 Identification of partition times can be informed by these underlying dynamics, perhaps as quantified by a mean or integral quantity. 
-As an example, it was found for the present work that the the core power provided useful guidance.
+As an example, it was found for the present work that the core power provided useful guidance.
 It is expected that heuristics might exist based on similar, integral in other applications, and that the process of selecting intervals might easily be integrated into an optimization scheme that determines an appropriate threshold value.
 
 \section{Results and Analysis}
@@ -218,7 +218,7 @@ The discretization used is far from numerically converged, but it produces a suf
       \draw[black,yshift=0.1*\y cm] (.3,0) -- (0,0) node[left] {$\ytext$};
 \end{scope}
 \end{tikzpicture}
-\caption{Schematic of LRA benchmark.  Region numbers indicate material assignment.  Region R is the the ejected rod.  A 15 cm coarse mesh for individual assemblies is overlaid.}
+\caption{Schematic of LRA benchmark.  Region numbers indicate material assignment.  Region R is the  ejected rod.  A 15 cm coarse mesh for individual assemblies is overlaid.}
 \label{fig:lra_core}
 \end{figure}
 
@@ -256,10 +256,7 @@ Though promising, the quality of the approximation proved to be very sensitive t
 
 \section{Conclusions}
 
-A DMD-based surrogate was shown to represent the spatiotemporal dynamics of the LRA benchmark accurately when by produced by a sequence of individual DMD surrogates in time. 
-The surrogate was shown to be sensitive to the time partioning.
-Work is ongoing to mitigate this sensitivity and to provide an automated way to select the number of partitions and their boundaries.
-
+A DMD-based surrogate was shown to represent the spatio-temporal dynamics of the LRA benchmark accurately when produced by a sequence of individual DMD surrogates in time. The benchmark exhibits a rapid severe change in dynamics within a very short time scale, which was captured by the DMD ensemble of surrogates allowing different ranks for each interval. The surrogate was able to offer a precision of $10^{-8}\%$ in the maximum power region, and a maximum error of 10\% at the very beginning of the simulation. The surrogate was shown to be sensitive to the time partitioning. Work is ongoing to mitigate this sensitivity and to provide an automated way to select the number of partitions and their boundaries.
 \section{Acknowledgments}
 
 The material presented is based on work supported in part by a U.S. NRC Faculty Develoment Grant. 
