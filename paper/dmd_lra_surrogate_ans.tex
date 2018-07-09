@@ -224,12 +224,12 @@ The discretization used is far from numerically converged, but it produces a suf
 
 The initial condition for the transient was computed by solving the steady-state equations, for which the $k_{\text{eff}}$ was found to be 0.9975.
 The transient was executed up to 3 seconds.
-The space and time discretization employed results in a local (fine-mesh) power distribution of $X \times X$ values recorded at Y times.
+The space and time discretization employed results in a local (fine-mesh) power distribution of $22 \times 22$ values recorded at 301 times.
 
 
 \section{Surrogate Generation and Performance}
 
-Snapshots of the mesh-dependent power were extracted from the Detran solution and used as input for the DMD analysis. All DMD analysis presented was performed using modifications of {\tt PyDMD} \cite{demo2018pydmd}.
+The snapshots of the mesh-dependent power extracted from the Detran solution were used as input for the DMD analysis. All DMD analysis presented was performed using modifications of  PyDMD \cite{demo2018pydmd}.
  
 By inspection, it was found that isolation of the transient peak power within a small time interval led naturally to a set of three, partioned DMD surrogates separated at $t = 1.36$ and $t = 1.5$ seconds.  The ranks used in each interval were 10, 13, and 40, each found by an iterative search to minimize the Frobenius norm of the surrogate error in each of the intervals.  Optimized amplitudes (elements of $\mathbf{b}$) were used for the first interval following Ref.~\cite{jovanovic2014sparsity}, while standard projection for the initial condition (i.e., $\mathbf{b}=\bm{\Phi}^{\dagger} \mathbf{y}_0$) was used for the second and third intervals.    The core power density and corresponding absolute, relative error are shown as a function of time in Fig.~\ref{fig:corepower}.  The core power was computed directly from the mesh powers. In addition, mesh powers are shown for $t=0$, $t=1.43$, and $t=2.00$ seconds (i.e., the intial distribution along with the distributions at each peaks) in Fig.~\ref{fig:meshpower}.  
 
