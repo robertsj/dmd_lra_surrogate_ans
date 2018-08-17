@@ -37,7 +37,7 @@ Hence, relatively  inexpensive surrogate models may be needed.
 
 Given access to a high-fidelity model and corresponding solution, data-driven techniques can be used to generate surrogates without resorting to simplified physics or modifying the underlying implementation.  
 One class of surrogates recently explored in the nuclear engineering community are those based on dynamic-mode decomposition.  
-These past applications involved spatiotemporal dynamics that evolved relatively slowly in time, e.g., the evolution of isotopics \cite{abdo2018data, elzohery2018cbg} and decay-heat generation \cite{alfonsi2018dhc}.
+These past applications involved spatio-temporal dynamics that evolved relatively slowly in time, e.g., the evolution of isotopics \cite{abdo2018data, elzohery2018cbg} and decay-heat generation \cite{alfonsi2018dhc}.
 
 Reactor transients exhibit much different dynamics.
 With the restart of TREAT, preliminary efforts to apply surrogates based on generalized polynomial chaos (gPC) for uncertainty quantification have had some success \cite{wang2017usa}.
@@ -52,7 +52,7 @@ Whereas a conventional DMD surrogate cannot capture the rapid dynamics of the LR
 \label{sec:backgound}
 
 Interest in DMD has grown over the past decade for its ability to represent complex models with explicit temporal dynamics based on observed data alone.  
-The basic algorithm was first proposed in the fluid-dynamics community by Schmid for the analysis of experimental data \cite{schmid2010dynamic} but was swiftly developed by others in a variety of fields as has been thorougly detailed in the recent monograph by Kutz {\it et al.} \cite{kutz2016dynamic}.
+The basic algorithm was first proposed in the fluid-dynamics community by Schmid for the analysis of experimental data \cite{schmid2010dynamic} but was swiftly developed by others in a variety of fields as has been thoroughly detailed in the recent monograph by Kutz {\it et al.} \cite{kutz2016dynamic}.
 Underlying the utility of DMD is its strong connection to Koopman theory and the Koopman operator, a linear, infinite-dimensional operator that acts on finite measurements of a nonlinear, dynamical system.
 In other words, the Koopman operator provides the machinery to describe the evolution of observations of a nonlinear system in time, and DMD provides a finite-dimensional approximation to this operator.
 
@@ -100,7 +100,7 @@ However, this matrix is large, and rather than compute it explicitly, the DMD ex
 \begin{equation}
 \mathbf{\tilde{A}} = \mathbf{U_r^{*}AU_r} \, .
 \end{equation}
-where $\mathbf{U}_r$ aggregates the first $r$  left singular vectors of $\mathbf{A}$.  Then the eigendomposition
+where $\mathbf{U}_r$ aggregates the first $r$  left singular vectors of $\mathbf{A}$.  Then the eigendecomposition
 \begin{equation}
  \mathbf{\tilde{A}}\mathbf{W} = \mathbf{W}\bm{\Lambda} \, ,
 \end{equation}
@@ -143,10 +143,11 @@ It is expected that heuristics might exist based on similar, integral in other a
 
 The two-dimensional, two-group diffusion LRA benchmark problem is a simplified, quarter-core, BWR model subject to a control-rod ejection with adiabatic heating.
 Although complete details can be found elsewhere \cite{anl}, the basic assembly layout is shown in Fig.~\ref{fig:lra_core}.
-To produce time-dependent snapshots, the determinstic transport code Detran\footnote{https://github.com/robertsj/libdetran} was used to solve the time-dependent diffusion equations.  
+To produce time-dependent snapshots, the deterministic transport code Detran\footnote{https://github.com/robertsj/libdetran} was used to solve the time-dependent diffusion equations.
+Detran is a research-oriented transport code that builds on PETSc\cite{petsc} for solving linear (and nonlinear) systems.  
 A mesh-centered, finite-volume discretization was used with a 7.5 cm mesh throughout.
 A second-order, backward-difference temporal discretization was used with a fixed 0.01 s step size.  
-The solution at each time step was converged using fixed-point iteration.
+The solution at each time step was converged using fixed-point iteration to within $10^{-8}$ based on the $L_2$ norm of successive iterates (which led to, on the average, approximately 5 iterations per time step).
 The discretization used is far from numerically converged, but it produces a sufficiently rich set of data for demonstration.
 
 \begin{figure}
@@ -224,14 +225,15 @@ The discretization used is far from numerically converged, but it produces a suf
 
 The initial condition for the transient was computed by solving the steady-state equations, for which the $k_{\text{eff}}$ was found to be 0.9975.
 The transient was executed up to 3 seconds.
-The space and time discretization employed results in a local (fine-mesh) power distribution of $X \times X$ values recorded at Y times.
+The space and time discretization employed results in a local (fine-mesh) power distribution of $22 \times 22$ values recorded at 301 times.
+The total computational time for the transient was approximately 30 s, though little effort was made to optimize this run time.
 
 
 \section{Surrogate Generation and Performance}
 
-Snapshots of the mesh-dependent power were extracted from the Detran solution and used as input for the DMD analysis. All DMD analysis presented was performed using modifications of {\tt PyDMD} \cite{demo2018pydmd}.
+The snapshots of the mesh-dependent power extracted from the Detran solution were used as input for the DMD analysis. All DMD analysis presented was performed using modifications of  PyDMD \cite{demo2018pydmd}.  
  
-By inspection, it was found that isolation of the transient peak power within a small time interval led naturally to a set of three, partioned DMD surrogates separated at $t = 1.36$ and $t = 1.5$ seconds.  The ranks used in each interval were 10, 13, and 40, each found by an iterative search to minimize the Frobenius norm of the surrogate error in each of the intervals.  Optimized amplitudes (elements of $\mathbf{b}$) were used for the first interval following Ref.~\cite{jovanovic2014sparsity}, while standard projection for the initial condition (i.e., $\mathbf{b}=\bm{\Phi}^{\dagger} \mathbf{y}_0$) was used for the second and third intervals.    The core power density and corresponding absolute, relative error are shown as a function of time in Fig.~\ref{fig:corepower}.  The core power was computed directly from the mesh powers. In addition, mesh powers are shown for $t=0$, $t=1.43$, and $t=2.00$ seconds (i.e., the intial distribution along with the distributions at each peaks) in Fig.~\ref{fig:meshpower}.  
+By inspection, it was found that isolation of the transient peak power within a small time interval led naturally to a set of three, partitioned DMD surrogates separated at $t = 1.36$ and $t = 1.5$ seconds.  The ranks used in each interval were 10, 13, and 40, each found by an iterative search to minimize the Frobenius norm of the surrogate error in each of the intervals.  Optimized amplitudes (elements of $\mathbf{b}$) were used for the first interval following Ref.~\cite{jovanovic2014sparsity}, while standard projection for the initial condition (i.e., $\mathbf{b}=\bm{\Phi}^{\dagger} \mathbf{y}_0$) was used for the second and third intervals.    The core power density and corresponding absolute, relative error are shown as a function of time in Fig.~\ref{fig:corepower}.  The core power was computed directly from the mesh powers. In addition, mesh powers are shown for $t=0$, $t=1.43$, and $t=2.00$ seconds (i.e., the intial distribution along with the distributions at each peaks) in Fig.~\ref{fig:meshpower}.  The total time to perform the DMD analysis and evaluate the surrogate was approximately 0.02 seconds, several orders of magnitude less than the reference diffusion solution.
 
 
 \begin{figure*}[t!]
@@ -248,18 +250,21 @@ By inspection, it was found that isolation of the transient peak power within a 
   \label{fig:meshpower}
 \end{figure*}
 
-The surrogate developed reproduces core power with a maximum error of approximately 10\% and much lower errors during the first peak.  The better approximation during the first peak can be attributed at least in part to the smaller time interval.  However, as observed in Fig.~\ref{fig:meshpower}, errors in the mesh powers are very small at the transient peak time of 1.43 s, which suggests the spatiotemporal dynamics through the transient peak are well approximated by a relatively small number of modes.  Errors in power distribution at $t = 0$ and $t = 2$ s are larger.
+The surrogate developed reproduces core power with a maximum error of approximately 10\% and much lower errors during the first peak.  The better approximation during the first peak can be attributed at least in part to the smaller time interval.  However, as observed in Fig.~\ref{fig:meshpower}, errors in the mesh powers are very small at the transient peak time of 1.43 s, which suggests the spatio-temporal dynamics through the transient peak are well approximated by a relatively small number of modes.  Errors in power distribution at $t = 0$ and $t = 2$ s are larger.
 
 
-Though promising, the quality of the approximation proved to be very sensitive to the time intervals, ranks, and amplited vector $\mathbf{b}$ used.  As extreme examples, the removal of just one mode in the second interval increased errors in mesh powers at $t = 1.43$ s from approximately $10^{-7}$ \% to 2.5\%, while the addition of one mode in the third interval led to a solution that grew exponentially in time, a clear indication that the mode added removed important information from the space spanned by the original 40 modes.  These are  significant sensitivities that must be addressed as part of future work, especially if the DMD surrogates are to play a role in quantification of uncertainty.
+Though promising, the quality of the approximation proved to be very sensitive to the time intervals, ranks, and amplitude vector $\mathbf{b}$ used.  As extreme examples, the removal of just one mode in the second interval increased errors in mesh powers at $t = 1.43$ s from approximately $10^{-7}$ \% to 2.5\%, while the addition of one mode in the third interval led to a solution that grew exponentially in time, a clear indication that the mode added removed important information from the space spanned by the original 40 modes.  These are  significant sensitivities that must be addressed as part of future work, especially if the DMD surrogates are to play a role in quantification of uncertainty.
+
 
 
 \section{Conclusions}
 
-A DMD-based surrogate was shown to represent the spatio-temporal dynamics of the LRA benchmark accurately when produced by a sequence of individual DMD surrogates in time. The benchmark exhibits a rapid severe change in dynamics within a very short time scale, which was captured by the DMD ensemble of surrogates allowing different ranks for each interval. The surrogate was able to offer a precision of $10^{-8}\%$ in the maximum power region, and a maximum error of 10\% at the very beginning of the simulation. The surrogate was shown to be sensitive to the time partitioning. Work is ongoing to mitigate this sensitivity and to provide an automated way to select the number of partitions and their boundaries.
+A DMD-based surrogate was shown to represent the spatio-temporal dynamics of the LRA benchmark accurately when produced by a sequence of individual DMD surrogates in time. The benchmark exhibits a rapid severe change in dynamics within a very short time scale, which was captured by the DMD ensemble of surrogates allowing different ranks for each interval. The surrogate was able to offer a precision of $10^{-8}\%$ in the maximum power region, and a maximum error of 10\% at the very beginning of the simulation. The surrogate was shown to be sensitive to the time partitioning.     Work is ongoing to mitigate this sensitivity and to provide an automated way to select the number of partitions and their boundaries.  
+
+
 \section{Acknowledgments}
 
-The material presented is based on work supported in part by a U.S. NRC Faculty Develoment Grant. 
+The material presented is based on work supported in part by a U.S. NRC Faculty Development Grant. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibliographystyle{ans}
