@@ -12,7 +12,7 @@
 # In[31]:
 
 
-get_ipython().magic('matplotlib inline')
+#get_ipython().magic('matplotlib inline')
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import loadmat
