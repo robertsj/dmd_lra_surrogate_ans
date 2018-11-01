@@ -17,9 +17,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.io import loadmat
 import scipy as sp
-from pydmd import DMD
+from dmd_jov import DMD_jov
 import pickle
-
+import os
 
 # In[32]:
 
@@ -78,6 +78,16 @@ maxtemp = A['maxtemp']#
 np.where(p==max(p))
 #mp = mp * c
 
+plt.semilogy(t, p, 'k-', label='reference')
+plt.xlabel('t (s)')
+plt.ylabel('power (W/cm$^3$)')
+plt.legend()
+plt.tight_layout()
+
+
+if not os.path.exists('../images'):
+    os.makedirs('../images')
+plt.savefig('../images/HF_Power.pdf')
 
 # Build the surrogates using a batch of DMD's
 
@@ -95,7 +105,7 @@ time_interval = [1.36,1.5,max(t)]
 r = [10,13,40]
 #r = [50,1e5,15]
 #step=[10,1,1]
-optimal=['jov',False,False]
+optimal=['Jov',False,False]
 # Perform dmd
 time_index = [0]
 for i in range(len(time_interval)):
@@ -106,7 +116,7 @@ results={}
 for i in range(len(time_interval)):
     start, stop = time_index[i], time_index[i+1]
     t_i = t[start:stop]
-    dmd = DMD(svd_rank=r[i],opt=optimal[i])   
+    dmd = DMD_jov(svd_rank=r[i],opt=optimal[i])   
     fuel_idx = mp[:, 0]>0                  # pick out fuel mesh
     tmp_reduced = mp[fuel_idx, start:stop] # extract fuel data
     tmp_full = 0*mp[:, start:stop]  # initialize full data
@@ -188,6 +198,9 @@ plt.ylabel('absolute error in power (\%)')
 plt.legend()
 
 plt.tight_layout()
+
+
+
 plt.savefig('../images/corepower.pdf')
 
 
