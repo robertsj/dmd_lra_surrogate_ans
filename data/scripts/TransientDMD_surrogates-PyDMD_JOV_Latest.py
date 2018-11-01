@@ -78,7 +78,7 @@ maxtemp = A['maxtemp']#
 np.where(p==max(p))
 #mp = mp * c
 
-plt.semilogy(t, p, 'k-', label='reference')
+plt.semilogy(t, p, 'k-')
 plt.xlabel('t (s)')
 plt.ylabel('power (W/cm$^3$)')
 plt.legend()
@@ -174,12 +174,13 @@ for k in range(len(time_interval)):
     plt.semilogy(results[k]['t'], results[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))
 plt.xlabel('t (s)')
 plt.ylabel('power (W/cm$^3$)')
-dpdt = np.gradient(p, t)
-idx_pos = dpdt>0
-idx_neg = dpdt<0
+#dpdt = np.gradient(p, t)
+#idx_pos = dpdt>0
+#idx_neg = dpdt<0
+
 #ax2left = ax2.twinx()
 #plt.semilogy(t, abs(dpdt), 'r:', label='derivative')
-plt.legend()
+#plt.legend()
 
 #plt.legend()
 
@@ -208,12 +209,12 @@ plt.savefig('../images/corepower.pdf')
 
 
 #plt.semilogy(t[idx_pos], dpdt[idx_pos], 'r.', ms=2)
-d2pdt2 = np.gradient(dpdt, t)
-ff = abs(p)
-plt.plot(t, ff, 'r-',
-            [time_interval[0],time_interval[0]], [min(ff), max(ff)],
-            [time_interval[1], time_interval[1]], [min(ff), max(ff)],
-            [1, 3], [6e3, 6e3])
+#d2pdt2 = np.gradient(dpdt, t)
+#ff = abs(d2pdt2)
+#plt.plot(t, ff, 'r-',
+#            [time_interval[0],time_interval[0]], [min(ff), max(ff)],
+#            [time_interval[1], time_interval[1]], [min(ff), max(ff)],
+#            [1, 3], [6e3, 6e3])
 
 #plt.axis([1.3, 1.6, min(ff)/5, max(ff)/5])
 t[p==max(p[t>1.6])]
