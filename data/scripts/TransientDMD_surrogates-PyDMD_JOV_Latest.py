@@ -20,7 +20,7 @@ import scipy as sp
 from dmd_jov import DMD_jov
 import pickle
 import os
-
+import time
 # In[32]:
 
 
@@ -95,52 +95,45 @@ plt.savefig('../images/HF_Power.pdf')
 
 
 #%%  DMD analysis
-import time
-et_0 = time.time()
-# Time step
-dt = t[1]-t[0]
-# Chop the time domain into discrete patches
-time_interval = [1.36,1.5,max(t)]
-# Define desire subspace size for each patch
-r = [10,13,40]
-#r = [50,1e5,15]
-#step=[10,1,1]
-optimal=['Jov',False,False]
-# Perform dmd
-time_index = [0]
-for i in range(len(time_interval)):
-    time_index.append(sp.sum(t<=time_interval[i]))
 
-F_norm = 0.0
-results={}
-for i in range(len(time_interval)):
-    start, stop = time_index[i], time_index[i+1]
-    t_i = t[start:stop]
-    dmd = DMD_jov(svd_rank=r[i],opt=optimal[i])   
-    fuel_idx = mp[:, 0]>0                  # pick out fuel mesh
-    tmp_reduced = mp[fuel_idx, start:stop] # extract fuel data
-    tmp_full = 0*mp[:, start:stop]  # initialize full data
-    dmd.fit(tmp_reduced)              # do the fit
-    tmp_full[fuel_idx] = dmd.reconstructed_data.real
-    results[i]={}
-    results[i]['dmd'] = dmd
-    results[i]['t'] = t_i # All the coming lines can be ommitted except p_dmd
-    results[i]['Phi'] = dmd.modes
-    results[i]['eigs'] = dmd.eigs
-    results[i]['mp_dmd'] = tmp_full.copy()#dmd.reconstructed_data
-    results[i]['p_dmd'] = sp.zeros(stop-start)
-    results[i]['p_dmd'] = c*sp.sum(tmp_full, axis=0)# c*sp.sum(dmd.reconstructed_data.real,axis=0)
-    F_norm_tmp = np.linalg.norm(tmp_reduced-dmd.reconstructed_data.real)
-    print("patch {} norm = {:.2e}".format(i, F_norm_tmp))
-    F_norm += F_norm_tmp**2
-  
-et = time.time() - et_0
-
-F_norm = np.sqrt(F_norm)
-print("final norm is {:.2e}".format(F_norm))
-
-print('elapsed time = ', et)
-
+def perform_dmd_analysis(t,r=[10,13,40],optimal=['Jov',False,False],time_interval = [1.36,1.5,max(t)]):
+    et_0 = time.time()
+    # Time step
+    dt = t[1]-t[0]
+    time_index = [0]
+    for i in range(len(time_interval)):
+        time_index.append(sp.sum(t<=time_interval[i]))
+    
+    F_norm = 0.0
+    results={}
+    for i in range(len(time_interval)):
+        start, stop = time_index[i], time_index[i+1]
+        t_i = t[start:stop]
+        dmd = DMD_jov(svd_rank=r[i],opt=optimal[i])   
+        fuel_idx = mp[:, 0]>0                  # pick out fuel mesh
+        tmp_reduced = mp[fuel_idx, start:stop] # extract fuel data
+        tmp_full = 0*mp[:, start:stop]  # initialize full data
+        dmd.fit(tmp_reduced)              # do the fit
+        tmp_full[fuel_idx] = dmd.reconstructed_data.real
+        results[i]={}
+        results[i]['dmd'] = dmd
+        results[i]['t'] = t_i # All the coming lines can be ommitted except p_dmd
+        results[i]['Phi'] = dmd.modes
+        results[i]['eigs'] = dmd.eigs
+        results[i]['mp_dmd'] = tmp_full.copy()#dmd.reconstructed_data
+        results[i]['p_dmd'] = sp.zeros(stop-start)
+        results[i]['p_dmd'] = c*sp.sum(tmp_full, axis=0)# c*sp.sum(dmd.reconstructed_data.real,axis=0)
+        F_norm_tmp = np.linalg.norm(tmp_reduced-dmd.reconstructed_data.real)
+        print("patch {} norm = {:.2e}".format(i, F_norm_tmp))
+        F_norm += F_norm_tmp**2
+      
+    et = time.time() - et_0
+    
+    F_norm = np.sqrt(F_norm)
+    print("final norm is {:.2e}".format(F_norm))
+    
+    print('elapsed time = ', et)
+    return results
 
 # In[36]:
 
@@ -152,7 +145,8 @@ print('elapsed time = ', et)
     
 #plt.pcolor(xgrid, tgrid, ((mp[start:stop, :].T-dmd.reconstructed_data).T).real)
 #fig = plt.colorbar()
-
+time_interval = [1.36,1.5,max(t)]
+results = perform_dmd_analysis(t) 
 markers = ['o', '^', 's', 'v']
 
 fig5=plt.figure(figsize=(15,5))
@@ -255,12 +249,12 @@ E[mp_2D==0]=0
 
 
 ## print('t=0')
-fig = plt.figure(figsize=(15,12.75))
+#fig = plt.figure(figsize=(15,12.75))
 
-steps = 0, 143, 200
+steps = 0, 143, 200, 301
 color = 'inferno'
 for i in range(len(steps)):
-    
+    fig = plt.figure(figsize=(15,12.75))
     ax1=fig.add_subplot(3,3,3*i+1)
     ax1.set_aspect('equal')
     vmax = max(np.max(mp_2D[:,:,steps[i]]), np.max(Xdmd_2D[:,:,steps[i]].real))
@@ -297,25 +291,9 @@ for i in range(len(steps)):
     plt.colorbar()
     if i == 0:
         plt.title('Relative Error (\%)')
+    plt.tight_layout()
+    fig.savefig('../images/meshpower_{}.pdf'.format(i))
 
-plt.tight_layout()
-plt.savefig('../images/meshpower.pdf')
-
-
-# In[13]:
-
-
-p[0]
-
-
-# In[14]:
-
-
-p[0]/sum(mp[:, 0])*17550.0
-
-
-# In[15]:
-
-
-sum(mp[:,0]), p[0]*17550.0
-
+#plt.tight_layout()
+#plt.savefig('../images/meshpower.pdf')
+#%%
