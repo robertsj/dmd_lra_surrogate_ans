@@ -134,7 +134,58 @@ def perform_dmd_analysis(t,r=[10,13,40],optimal=['Jov',False,False],time_interva
     
     print('elapsed time = ', et)
     return results
-
+#%% Sensitivity Study
+def rank_sensitivity_study(t,r0=[10,13,40]):
+    results_r0 = perform_dmd_analysis(t,r=r0)
+    markers = ['o', '^', 's', 'v']
+    fig5=plt.figure(figsize=(15,5))
+    ax1=fig5.add_subplot(1,3,1)
+    plt.plot(t, p, 'k-', label='reference')
+    for k in range(len(time_interval)):
+        plt.plot(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
+    plt.axis([0, 3, 0, 5000])
+    plt.xlabel('t (s)')
+    plt.ylabel('power (W/cm$^3$)')
+    plt.legend(loc="upper right")
+    
+    # Plot the surrogate and reference on a log plot.  Put the derivative on the other axis.
+    ax2=fig5.add_subplot(1,3,2)  
+    plt.semilogy(t, p, 'k-', label='reference')
+    for k in range(len(time_interval)):
+        plt.semilogy(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))
+    plt.xlabel('t (s)')
+    plt.ylabel('power (W/cm$^3$)')
+    #dpdt = np.gradient(p, t)
+    #idx_pos = dpdt>0
+    #idx_neg = dpdt<0
+    
+    #ax2left = ax2.twinx()
+    #plt.semilogy(t, abs(dpdt), 'r:', label='derivative')
+    #plt.legend()
+    
+    #plt.legend()
+    
+    # Plot the error
+    ax2=fig5.add_subplot(1,3,3)  
+    t_start = 0
+    for k in range(len(time_interval)):
+        t_end = t_start + len(results_r0[k]['t'])
+        ref = p[t_start:t_end]
+        err = abs(results_r0[k]['p_dmd'].real-ref)/ref*100
+        plt.semilogy(t[t_start:t_end], err, marker=markers[k], 
+                     ls='', mfc='w', label='interval '+str(k))
+        t_start = t_end
+    plt.xlabel('t (s)')
+    plt.ylabel('absolute error in power (\%)')
+    plt.legend()
+    
+    plt.tight_layout()
+    
+    
+    
+    plt.savefig('../images/corepower_ranks{}{}{}.pdf'.format(r0[0],r0[1],r0[2]))
+    return
+    
 # In[36]:
 
 
@@ -251,11 +302,11 @@ E[mp_2D==0]=0
 ## print('t=0')
 #fig = plt.figure(figsize=(15,12.75))
 
-steps = 0, 143, 200, 301
+steps = 0, 143, 200, 300
 color = 'inferno'
 for i in range(len(steps)):
     fig = plt.figure(figsize=(15,12.75))
-    ax1=fig.add_subplot(3,3,3*i+1)
+    ax1=fig.add_subplot(4,3,3*i+1)
     ax1.set_aspect('equal')
     vmax = max(np.max(mp_2D[:,:,steps[i]]), np.max(Xdmd_2D[:,:,steps[i]].real))
     vmin = 0.0#min(np.min(mp_2D[:,:,steps[i]]>0), np.min(Xdmd_2D[:,:,steps[i]].real>0))
@@ -272,7 +323,7 @@ for i in range(len(steps)):
     plt.ylabel('t = {:.2f} s \ny (cm)'.format(t[steps[i]]))
     plt.axis([0, 135, 0, 135])
 
-    ax2=fig.add_subplot(3,3,3*i+2)
+    ax2=fig.add_subplot(4,3,3*i+2)
     ax2.set_aspect('equal')
     plt.axis([0, 135, 0, 135])
     plot=plt.pcolor(xgrid, ygrid, Xdmd_2D[:,:,steps[i]].real.T,cmap=color,  
@@ -283,7 +334,7 @@ for i in range(len(steps)):
     if i == 0:
         plt.title('DMD')
 
-    ax3=fig.add_subplot(3,3,3*i+3)
+    ax3=fig.add_subplot(4,3,3*i+3)
     ax3.set_aspect('equal')
     plt.axis([0, 135, 0, 135])
     plt.pcolor(xgrid, ygrid, E[:,:,steps[i]].T,cmap=color,  
@@ -294,6 +345,22 @@ for i in range(len(steps)):
     plt.tight_layout()
     fig.savefig('../images/meshpower_{}.pdf'.format(i))
 
-#plt.tight_layout()
-#plt.savefig('../images/meshpower.pdf')
-#%%
+
+
+rank_sensitivity_study(t,r0=[10,13,20])
+
+rank_sensitivity_study(t,r0=[9,13,20])
+rank_sensitivity_study(t,r0=[8,13,20])
+rank_sensitivity_study(t,r0=[5,13,20])
+rank_sensitivity_study(t,r0=[11,13,20])
+rank_sensitivity_study(t,r0=[12,13,20])
+
+rank_sensitivity_study(t,r0=[10,14,20])
+rank_sensitivity_study(t,r0=[10,15,20])
+rank_sensitivity_study(t,r0=[10,12,20])
+rank_sensitivity_study(t,r0=[10,10,20])
+
+rank_sensitivity_study(t,r0=[10,11,25])
+rank_sensitivity_study(t,r0=[10,11,40])
+rank_sensitivity_study(t,r0=[10,11,100])
+rank_sensitivity_study(t,r0=[10,11,150])

@@ -43,7 +43,7 @@ class DMD_jov(DMDBase):
         """
         if opt =='Jov':
             
-            Vand = np.zeros((s.shape[0], V.shape[0])); # Vandermonde matrix
+            Vand = np.zeros((s.shape[0], V.shape[0]),dtype=complex); # Vandermonde matrix
             for k in range(V.shape[0]):
                 Vand[:, k] = eigs**(k)
              
