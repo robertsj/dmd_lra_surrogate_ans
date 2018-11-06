@@ -96,7 +96,7 @@ plt.savefig('../images/HF_Power.pdf')
 
 #%%  DMD analysis
 
-def perform_dmd_analysis(t,r=[10,13,40],optimal=['Jov',False,False],time_interval = [1.36,1.5,max(t)]):
+def perform_dmd_analysis(t,r=[10,13,20],optimal=['Jov',False,False],time_interval = [1.36,1.5,max(t)]):
     et_0 = time.time()
     # Time step
     dt = t[1]-t[0]
@@ -135,7 +135,7 @@ def perform_dmd_analysis(t,r=[10,13,40],optimal=['Jov',False,False],time_interva
     print('elapsed time = ', et)
     return results
 #%% Sensitivity Study
-def rank_sensitivity_study(t,r0=[10,13,40]):
+def rank_sensitivity_study(t,r0=[10,13,20]):
     results_r0 = perform_dmd_analysis(t,r=r0)
     markers = ['o', '^', 's', 'v']
     fig5=plt.figure(figsize=(15,5))
@@ -360,7 +360,7 @@ rank_sensitivity_study(t,r0=[10,15,20])
 rank_sensitivity_study(t,r0=[10,12,20])
 rank_sensitivity_study(t,r0=[10,10,20])
 
-rank_sensitivity_study(t,r0=[10,11,25])
-rank_sensitivity_study(t,r0=[10,11,40])
-rank_sensitivity_study(t,r0=[10,11,100])
-rank_sensitivity_study(t,r0=[10,11,150])
+rank_sensitivity_study(t,r0=[10,13,25])
+rank_sensitivity_study(t,r0=[10,13,40])
+rank_sensitivity_study(t,r0=[10,13,100])
+rank_sensitivity_study(t,r0=[10,13,150])
