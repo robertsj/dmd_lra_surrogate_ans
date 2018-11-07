@@ -61,7 +61,7 @@
 \newcommand{\vd}{\bm{\cdot}} % slightly bold vector dot
 \newcommand{\grad}{\vec{\nabla}} % gradient
 \newcommand{\ud}{\mathop{}\!\mathrm{d}} % upright derivative symbol
-\graphicspath{{../data/images/}}
+\graphicspath{{../../data/images/}}
 
 \usetikzlibrary{arrows,shapes}
 \usetikzlibrary{decorations.pathreplacing,matrix, positioning}
@@ -438,6 +438,7 @@ $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_
 
 \end{itemize}
 \end{frame}
+
 \begin{frame}
 \frametitle{Case Study}
 \begin{figure}[ht]
@@ -456,6 +457,10 @@ $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_
 
 \begin{frame}
 \frametitle{Case Study}
+\begin{itemize}
+ \item ranks are respectively: 10,13,20
+\end{itemize}
+
 \begin{figure}[ht]
 \includegraphics[scale=0.3]{corepower.pdf}
 \caption{Partitioned DMD surrogates}
@@ -470,6 +475,157 @@ $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_
 \end{figure}
 \end{frame}
 
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item The surrogate is so fragile
+ \item Highly sensitive to rank perturbations
+ \item ranks = 9, 13, 20 respectively
+\end{itemize}
+
+\begin{figure}[ht]
+
+\includegraphics[scale=0.3]{corepower_ranks91320.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 8, 13, 20 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks81320.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 5, 13, 20 respectively
+\end{itemize}
+
+\begin{figure}[ht]
+
+\includegraphics[scale=0.3]{corepower_ranks51320.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 11, 13, 20 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks111320.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 12, 13, 20 respectively
+\end{itemize}
+
+\begin{figure}[ht]
+
+\includegraphics[scale=0.3]{corepower_ranks121320.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 14, 20 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks101420.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 15, 20 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks101520.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 12, 20 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks101220.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 10, 20 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks101020.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 13, 25 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks101325.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 13, 40 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks101340.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 13, 100 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks1013100.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Sensitivity Study: Ranks perturbation}
+\begin{itemize}
+ \item ranks = 10, 13, 150 respectively
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{corepower_ranks1013150.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
   
    \begin{frame}
    \section{Conclusion and Future Work }
