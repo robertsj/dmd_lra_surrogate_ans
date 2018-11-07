@@ -66,14 +66,14 @@
 \usetikzlibrary{arrows,shapes}
 \usetikzlibrary{decorations.pathreplacing,matrix, positioning}
 \setlength\intextsep{1\baselineskip plus 3pt minus 2 pt}
-\usepackage{minted} % Allows printing of python (or other) code
-\newminted{python}{fontsize=\scriptsize, 
-    linenos,
-    numbersep=8pt,
-    gobble=4,
-    frame=lines,
-    bgcolor=bg,
-    framesep=3mm}
+%\usepackage{minted} % Allows printing of python (or other) code
+%\newminted{python}{fontsize=\scriptsize, 
+%    linenos,
+%    numbersep=8pt,
+%    gobble=4,
+%    frame=lines,
+%    bgcolor=bg,
+%    framesep=3mm}
 
 % The title of the presentation:
 %  - first a short version which is visible at the bottom of each slide;
@@ -88,9 +88,9 @@
 %  - again first a short version to be displayed at the bottom;
 %  - next the full list of authors, which may include contact information;
 \author[]{
-	Dr. Mohammad Abdo \\
-    Rabab Elzohery \\
-    Prof. Jeremy Roberts}
+Dr. Mohammad Abdo \\
+	       Rabab Elzohery \\
+               Prof. Jeremy Roberts}
 
 % The institute:
 %  - to start the name of the university as displayed on the top of each slide
@@ -104,8 +104,8 @@
 %  - again first a short version to be shown at the bottom of each slide
 %  - second the full date and event name for the title slide
 
-\date[]{\emph{\textbf{2018 ANS Winter Meeting and Nuclear Technology Expo, "Joining Forces to Advance Nuclear"}}
-    November 11-15- 2018}
+\date[]{\emph{{\textbf{2018 ANS Winter Meeting and Nuclear Technology Expo, "Joining Forces to Advance Nuclear"}}
+    November 11-15- 2018}}
 
 \begin{document}
     % These two commands allow bonus slides at the end
@@ -469,8 +469,44 @@ $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_
 
 \begin{frame}
 \frametitle{Case Study}
+\begin{itemize}
+	\item At the beginning of simulation ($t=0$)
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.3]{meshpower_0.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Case Study}
+\begin{itemize}
+	\item At ($t=1.43$ sec)
+\end{itemize}
 \begin{figure}[ht]
-\includegraphics[scale=0.18]{meshpower.pdf}
+\includegraphics[scale=0.3]{meshpower_1.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Case Study}
+\begin{itemize}
+	\item At ($t=2$ sec).
+\end{itemize}
+\begin{figure}
+\includegraphics[scale=0.3]{meshpower_2.pdf}
+\caption{Partitioned DMD surrogates}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Case Study}
+\begin{itemize}
+	\item At the end of simulation ($t=3$ sec)
+\end{itemize}
+\begin{figure}[ht]
+\includegraphics[scale=0.3]{meshpower_3.pdf}
 \caption{Partitioned DMD surrogates}
 \end{figure}
 \end{frame}
@@ -537,7 +573,6 @@ $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_
 \caption{Partitioned DMD surrogates}
 \end{figure}
 \end{frame}
-
 
 \begin{frame}
 \frametitle{Sensitivity Study: Ranks perturbation}

@@ -317,8 +317,8 @@ for i in range(len(steps)):
     cbar = fig.colorbar(plot)
     cbar.formatter.set_powerlimits((0, 0))
     cbar.update_ticks()
-    if i == 0:
-        plt.title('Reference')
+        
+    plt.title('Reference')
     plt.xlabel('x (cm)')
     plt.ylabel('t = {:.2f} s \ny (cm)'.format(t[steps[i]]))
     plt.axis([0, 135, 0, 135])
@@ -331,8 +331,8 @@ for i in range(len(steps)):
     cbar = fig.colorbar(plot)
     cbar.formatter.set_powerlimits((0, 0))
     cbar.update_ticks()
-    if i == 0:
-        plt.title('DMD')
+    
+    plt.title('DMD')
 
     ax3=fig.add_subplot(4,3,3*i+3)
     ax3.set_aspect('equal')
@@ -340,8 +340,8 @@ for i in range(len(steps)):
     plt.pcolor(xgrid, ygrid, E[:,:,steps[i]].T,cmap=color,  
                rasterized=True, linewidth=0)
     plt.colorbar()
-    if i == 0:
-        plt.title('Relative Error (\%)')
+    
+    plt.title('Relative Error (\%)')
     plt.tight_layout()
     fig.savefig('../images/meshpower_{}.pdf'.format(i))
 
