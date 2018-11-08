@@ -135,8 +135,8 @@ def perform_dmd_analysis(t,r=[10,13,20],optimal=['Jov',False,False],time_interva
     print('elapsed time = ', et)
     return results
 #%% Sensitivity Study
-def rank_sensitivity_study(t,r0=[10,13,20]):
-    results_r0 = perform_dmd_analysis(t,r=r0)
+def rank_sensitivity_study(t,r0=[10,13,20],time_interval = [1.36,1.5,max(t)]):
+    results_r0 = perform_dmd_analysis(t,r=r0, time_interval = time_interval)
     markers = ['o', '^', 's', 'v']
     fig5=plt.figure(figsize=(15,5))
     ax1=fig5.add_subplot(1,3,1)
@@ -183,7 +183,7 @@ def rank_sensitivity_study(t,r0=[10,13,20]):
     
     
     
-    plt.savefig('../images/corepower_ranks{}{}{}.pdf'.format(r0[0],r0[1],r0[2]))
+    plt.savefig('../images/corepower_ranks{}{}{}_t{}{}{}.pdf'.format(r0[0],r0[1],r0[2],int(np.floor(time_interval[0]*100)),int(np.floor(time_interval[1]*100)),int(np.floor(time_interval[2]*100))))
     return
     
 # In[36]:
@@ -364,3 +364,8 @@ rank_sensitivity_study(t,r0=[10,13,25])
 rank_sensitivity_study(t,r0=[10,13,40])
 rank_sensitivity_study(t,r0=[10,13,100])
 rank_sensitivity_study(t,r0=[10,13,150])
+
+# time window sensitivty study
+rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.2,1.56,max(t)])
+rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.2,1.4,max(t)])
+rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.3,2.0,max(t)])
