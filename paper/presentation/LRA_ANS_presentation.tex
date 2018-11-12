@@ -405,8 +405,8 @@ $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_
 \begin{itemize}
 \item$\vec{b}=\boldsymbol{\Phi}^{DMD\dagger}\vec{x_0}.$
 \item $\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\mathbf{X_{1}} -\boldsymbol{\Phi}^{DMD}\mathbf{D}_b\mathbf{V}_{and}\|_F $.
-\item$\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\boldsymbol{\Sigma_r}\mathbf{V^{H}} -\mathbf{W}\mathbf{D}_b\mathbf{V}_{and}\|_F.$
-\item $\vec{b}_{opt}=\left( (\mathbf{W^H}\mathbf{W})\circ( \overline{\mathbf{V}_{and}\mathbf{V}_{and}^{H}})\right)^{-1}\overline{diag(\mathbf{V}_{and}\mathbf{V}\boldsymbol{\Sigma}^{H}\mathbf{W})}$.
+\item$\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\boldsymbol{\Sigma_r}\mathbf{V^{H}} -\mathbf{\tilde{W}}\mathbf{D}_b\mathbf{V}_{and}\|_F.$
+\item $\vec{b}_{opt}=\left( (\mathbf{\tilde{W}^H}\mathbf\tilde{{W}})\circ( \overline{\mathbf{V}_{and}\mathbf{V}_{and}^{H}})\right)^{-1}\overline{diag(\mathbf{V}_{and}\mathbf{V}\boldsymbol{\Sigma}^{H}\mathbf{\tilde{W}})}$.
 \end{itemize}
 \end{block}
 \end{frame}
