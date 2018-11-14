@@ -199,7 +199,7 @@ Present goal is a completely data-driven surrogate based on Dynamic Mode Decompo
 \frametitle{DMD Overview}
 
 
-DMD was first used to analyze fluid dynamics experiments (P.J. Schmid, J. Fluid Mech. {\bf 656}), and most recent advanced summarized in a recent monograph (N. Kutz {\it et al.}, SIAM).
+DMD was first used to analyze fluid dynamics experiments (P.J. Schmid, J. Fluid Mech. {\bf 656}), and most recent advances are summarized in a recent monograph (N. Kutz {\it et al.}, SIAM).
 
 \pause
 \vfill
@@ -393,47 +393,18 @@ Here, all partitioning is {\it ad hoc}, but variable that could be formally opti
 \end{frame}
 
 
+
+\section{Numerical Experiments and Results}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}
 
-\frametitle{LRA Benchmark: Laboratorium f{\"u}r Reaktorregelung und Anlagensicherung}       
-
-\begin{itemize}
-  \item 2D LRA benchmark is a 2-group, quarter-core BWR.
-  \item Simplicity of the geometry renders the problem tractable personal computers
-  \item  It was used to test modern neutronics codes.        
-    \item assemply homogenized cross section data
-    \item ramp absorption cross section is simulation control rod ejection
-    \item Originally posed as a diffusion problem, solved with coarse mesh and nodel diffusion methods.
-    \item Scruntinizes the reactivity insertion accedent. 
-       
-\end{itemize}
-
-\end{frame}
-
-    
-\begin{frame}
-
-\frametitle{DETRAN:}       
-\begin{itemize}
-       \item A DEterministic TRANsport code originally developed by Jermey Roberts.
-       \item It utilizes methods such as Multigroup diffusion, discrete ordinates, MOC.
-       \item features solvers for fixed source and eigenvalue problems including preconditioned-Krylov linear solvers. 
-%         
-    \item For this work, 2-group diffusion was employed to provide the data, hereinafter refered to as the high fidelity data.
-       
-  
-       \end{itemize}
-    \end{frame}
+\frametitle{A Simple Surrogate for Experiments: The LRA Benchmark}       
 
 
-    \section{Actual Model Description}
-
-    \begin{frame}
-        \frametitle{Physical Model}
-        \begin{columns}[c]
-            \begin{column}{0.7\textwidth} 
+\begin{columns}[c]
+\begin{column}{0.7\textwidth} 
 \begin{figure}
 \begin{tikzpicture}[scale=.3]
 
@@ -498,9 +469,9 @@ Here, all partitioning is {\it ad hoc}, but variable that could be formally opti
  
 % ticks
   \foreach \x/\xtext in {15, 75, 105, 120, 135, 165}
-      \draw[black,xshift=0.1*\x cm] (0,.3) -- (0,0) node[below] {$\xtext$};
+      \draw[black,xshift=0.1*\x cm] (0,.3) -- (0,0) node[below] {{\tiny $\xtext$}};
   \foreach \y/\ytext in {15, 75, 105, 120, 135, 165}
-      \draw[black,yshift=0.1*\y cm] (.3,0) -- (0,0) node[left] {$\ytext$};
+      \draw[black,yshift=0.1*\y cm] (.3,0) -- (0,0) node[left] {{\tiny $\ytext$}};
 \end{scope}
 \end{tikzpicture}
 \end{figure}
@@ -508,83 +479,116 @@ Here, all partitioning is {\it ad hoc}, but variable that could be formally opti
             \begin{column}{0.4\textwidth} 
                              \begin{block}{Model Description}              
  \begin{itemize}     
-                    \item Super Prompt-critical Transient. 
-                    \item 2D Diffusion.
-                    \item Adiabatic Heatup and Doppler Feedback in thermal reactor.
-                    
+                    \item Super prompt-critical transient. 
+                    \item Two-group diffusion.
+                    \item Adiabatic heatup with doppler feedback.
+                    \item Two precursor groups.
                     \end{itemize}
                 \end{block}
             \end{column}
         \end{columns}
-    \end{frame}
-    \begin{frame}
-    \frametitle{Governing Equations}
-\begin{block}{2D Diffusion with two Delayed Neutron Precursor groups.}
+%     \end{frame}
+% 
+% 
+% \begin{itemize}
+%   \item 2D LRA benchmark is a 2-group, quarter-core BWR.
+%   \item Simplicity of the geometry renders the problem tractable personal computers
+%   \item  It was used to test modern neutronics codes.        
+%     \item assemply homogenized cross section data
+%     \item ramp absorption cross section is simulation control rod ejection
+%     \item Originally posed as a diffusion problem, solved with coarse mesh and nodel diffusion methods.
+%     \item Scruntinizes the reactivity insertion accedent. 
+%        
+% \end{itemize}
 
-	\begin{align*}
-	\label{eq:Diffusion}
-	& \nabla D_1(\vec{x},t)\nabla \phi_1(\vec{x},t)-[\Sigma_{a1}(\vec{x},t)+\Sigma_{1\rightarrow2}(\vec{x},t)]\phi_1(\vec{x},t)\\
-	& +\nu( 1- \beta )[\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)]\\
-	& +\Sigma_{i=1}^{2}\lambda_i c_i (\vec{x},t)=\frac{1}{v_1}\frac{\partial}{\partial t}\phi_1(\vec{x},t).\\
-	& \nabla D_2(\vec{x},t)\nabla \phi_2(\vec{x},t)-\Sigma_{a2}(\vec{x},t)\phi_2(\vec{x},t)+\Sigma_{1\rightarrow2}(\vec{x},t)\phi_1(\vec{x},t)\\
-	& =\frac{1}{v_2}\frac{\partial}{\partial t}\phi_2(\vec{x},t).\\
-	& \nu\beta_i[\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)]-\lambda_ic_i(\vec{x},t)\\
-	&=\frac{\partial}{\partial t}c_i(\vec{x},t), \ i=1,2.
-	\end{align*}
-\end{block}
 \end{frame}
+
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\begin{block}{Adiabatic Heatup}
-\begin{equation*}
-\alpha[\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)]=\frac{\partial}{\partial t}T(\vec{x},t).
-\end{equation*}
-\end{block}
 
-\begin{block}{Doppler Feedback}
-\begin{equation*}
-\Sigma_{a1}(\vec{x},t) = \Sigma_{a2}(\vec{x},t=0)[1+\gamma(\sqrt(T(\vec{x},t))-\sqrt(T_0))].
-\end{equation*}
-\end{block}
+\frametitle{Generation of Data}
 
-\begin{block}{Power}
-\begin{equation*}
-P(\vec{x},t)=\varepsilon [\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)].
-\end{equation*}
-\end{block}
-\end{frame}
-% * <mgabdo@ksu.edu> 2018-03-28T13:53:50.537Z:
-%
-% ^.
-
-
-
-\section{Numerical Experiments and Results}
-\begin{frame}
-\frametitle{Case Study}
+{\tt Detran} (a sparsely documented thesis [aka research] code\footnote{github.com/robertsj/libdetran}) used for all data generation.  
+Features of potential interest:
 \begin{itemize}
-\item Building a surrogate for the responses of interest: i.e., Power, flux, and/or temperature.
-
-\item 300 snapshots.
-\item $22 \times 22$ spatial cells.
-\item 3 seconds simulation time.
-\item control rod:
-\begin{equation*}
-    \frac{\Sigma_{a2}(t)}{\Sigma_{a2}(0)}=\left\{
-\begin{array}{ll}
-1-0.0606184 \ t & t\le 0.2 \ \ sec\\
-0.878763 & t>0.2 \ \ sec\\
-\end{array} \right. 
-\end{equation*}
-
+  \item 1/2/3-D diffusion and discrete-ordinates on a Cartesian mesh
+  \item Multiple linear and eigen solvers (interfaces to PETSc and SLEPc with some homegrown implementations like generalized Davidson)
+  \item Coarse-mesh, multigroup DSA-like preconditioners (for transport)
+  \item Time stepping with BDF methods (orders 1--6)
+  \item C++ with Python interface (with insertion point for feedback)
+  \item {\bf LRA is implemented as a compiled material class (exposed to Python)}
 \end{itemize}
+
+\end{frame}
+
+% 
+%     \begin{frame}
+%     \frametitle{Governing Equations}
+% \begin{block}{2D Diffusion with two Delayed Neutron Precursor groups.}
+% 
+% 	\begin{align*}
+% 	\label{eq:Diffusion}
+% 	& \nabla D_1(\vec{x},t)\nabla \phi_1(\vec{x},t)-[\Sigma_{a1}(\vec{x},t)+\Sigma_{1\rightarrow2}(\vec{x},t)]\phi_1(\vec{x},t)\\
+% 	& +\nu( 1- \beta )[\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)]\\
+% 	& +\Sigma_{i=1}^{2}\lambda_i c_i (\vec{x},t)=\frac{1}{v_1}\frac{\partial}{\partial t}\phi_1(\vec{x},t).\\
+% 	& \nabla D_2(\vec{x},t)\nabla \phi_2(\vec{x},t)-\Sigma_{a2}(\vec{x},t)\phi_2(\vec{x},t)+\Sigma_{1\rightarrow2}(\vec{x},t)\phi_1(\vec{x},t)\\
+% 	& =\frac{1}{v_2}\frac{\partial}{\partial t}\phi_2(\vec{x},t).\\
+% 	& \nu\beta_i[\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)]-\lambda_ic_i(\vec{x},t)\\
+% 	&=\frac{\partial}{\partial t}c_i(\vec{x},t), \ i=1,2.
+% 	\end{align*}
+% \end{block}
+% \end{frame}
+% \begin{frame}
+% \begin{block}{Adiabatic Heatup}
+% \begin{equation*}
+% \alpha[\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)]=\frac{\partial}{\partial t}T(\vec{x},t).
+% \end{equation*}
+% \end{block}
+% 
+% \begin{block}{Doppler Feedback}
+% \begin{equation*}
+% \Sigma_{a1}(\vec{x},t) = \Sigma_{a2}(\vec{x},t=0)[1+\gamma(\sqrt(T(\vec{x},t))-\sqrt(T_0))].
+% \end{equation*}
+% \end{block}
+% 
+% \begin{block}{Power}
+% \begin{equation*}
+% P(\vec{x},t)=\varepsilon [\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\vec{x},t)\phi_2(\vec{x},t)].
+% \end{equation*}
+% \end{block}
+% \end{frame}
+% % * <mgabdo@ksu.edu> 2018-03-28T13:53:50.537Z:
+% %
+% % ^.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Generation of Data -- Inputs}
+
+{\tt Detran} was used to solve the LRA problem subject to
+\begin{itemize}
+  \item fixed $\Delta t = 0.01$ s (not resolved!)
+  \item fixed $\Delta x = \Delta y = 7.5$ cm (not resolved!)
+  \item BDF-2 (second-order) time stepping
+  \item Iterative (Picard) updates of flux and temperature to with $10^{-8}$ on successive differences
+  \item Final time of 3.0 s (following initiation of transient)
+\end{itemize}
+\vfill 
+Total computational time: $\approx$ 25 s. \\
+Number of snapshots: $301$\\
+Snapshot size: 484
+\vfill 
+
 \end{frame}
 
 \begin{frame}
-\frametitle{Case Study}
+\frametitle{Generation of Data -- Core Power}
 \begin{figure}[ht]
-\includegraphics[scale=0.5]{HF_Power.pdf}
-\caption{Power from Detran}
+\includegraphics[scale=0.55]{HF_Power.pdf}
 \end{figure}
+Maximum power of 4260 W/cm$^3$ at 1.43 s
 \end{frame}
 
 % \begin{frame}
@@ -596,15 +600,11 @@ P(\vec{x},t)=\varepsilon [\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\v
 % \end{frame}
 
 \begin{frame}
-\frametitle{Case Study}
-\begin{itemize}
- \item ranks are respectively: 10,13,20
-\end{itemize}
+\frametitle{DMD Analysis -- Core Power}
 
-\begin{figure}[ht]
-\includegraphics[scale=0.3]{corepower.pdf}
-\caption{Partitioned DMD surrogates}
-\end{figure}
+\includegraphics[scale=0.35]{corepower.pdf}
+
+Partition ranks of 10, 13, 20
 \end{frame}
 
 \begin{frame}
