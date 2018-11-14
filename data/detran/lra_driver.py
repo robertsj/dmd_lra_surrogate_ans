@@ -13,7 +13,6 @@ import time
 import cPickle as pickle
 import numpy as np
 
-def get
 
 def run(fmm) :
 
@@ -133,5 +132,5 @@ def run(fmm) :
 
 if __name__ == "__main__":
     solvers.Manager.initialize(sys.argv)
-    run(fmm=15)
+    run(fmm=2)
     solvers.Manager.finalize()
