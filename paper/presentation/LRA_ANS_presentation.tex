@@ -147,7 +147,7 @@ Growing interest in transient phenomena have led to new experiments and renewed 
 \vfill 
 \pause 
 
-Analysis of experiments may required the use of advanced tools (e.g., MAMMOTH/Rattlesnake + other creatures)
+Analysis of experiments may require the use of advanced tools (e.g., MAMMOTH/Rattlesnake + other creatures)
 
 \pause 
 \vfill
@@ -575,16 +575,20 @@ Features of potential interest:
   \item Iterative (Picard) updates of flux and temperature to with $10^{-8}$ on successive differences
   \item Final time of 3.0 s (following initiation of transient)
 \end{itemize}
+\vfill
+Snapshots acquired included cell fluxes, {\bf powers}, and temperatures.
 \vfill 
 Total computational time: $\approx$ 25 s. \\
 Number of snapshots: $301$\\
-Snapshot size: 484
+Snapshot size: 484 
 \vfill 
 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Generation of Data -- Core Power}
+
 \begin{figure}[ht]
 \includegraphics[scale=0.55]{HF_Power.pdf}
 \end{figure}
@@ -599,58 +603,60 @@ Maximum power of 4260 W/cm$^3$ at 1.43 s
 % \end{figure}
 % \end{frame}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{DMD Analysis -- Core Power}
 
 \includegraphics[scale=0.35]{corepower.pdf}
 
-Partition ranks of 10, 13, 20
+Partition times: 0, 1.36, 1.5, 3.0 s\\
+Partition ranks: 10, 13, 20
+
 \end{frame}
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Case Study}
-\begin{itemize}
-	\item At the beginning of simulation ($t=0$)
-\end{itemize}
-\begin{figure}
-\includegraphics[scale=0.3]{meshpower_0.pdf}
-\caption{Partitioned DMD surrogates}
-\end{figure}
+\frametitle{DMD Analysis -- Power Profile for $t = 0$}
+
+\includegraphics[scale=0.30]{meshpower_0.pdf}
+
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Case Study}
-\begin{itemize}
-	\item At ($t=1.43$ sec)
-\end{itemize}
-\begin{figure}[ht]
+\frametitle{DMD Analysis -- Power Profile for $t = 1.43$}
+
 \includegraphics[scale=0.3]{meshpower_1.pdf}
-\caption{Partitioned DMD surrogates}
-\end{figure}
+
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Case Study}
-\begin{itemize}
-	\item At ($t=2$ sec).
-\end{itemize}
-\begin{figure}
+\frametitle{DMD Analysis -- Power Profile for $t = 2$}
+
 \includegraphics[scale=0.3]{meshpower_2.pdf}
-\caption{Partitioned DMD surrogates}
-\end{figure}
+
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{Case Study}
-\begin{itemize}
-	\item At the end of simulation ($t=3$ sec)
-\end{itemize}
-\begin{figure}[ht]
+\frametitle{DMD Analysis -- Power Profile for $t = 3$}
+
 \includegraphics[scale=0.3]{meshpower_3.pdf}
-\caption{Partitioned DMD surrogates}
-\end{figure}
+ 
 \end{frame}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Whence the Dominant Error?}
+
+\includegraphics[scale=0.3]{meshpower_3.pdf}
+ 
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
 \frametitle{Sensitivity Study: Ranks perturbation}
 \begin{itemize}
@@ -849,15 +855,16 @@ Partition ranks of 10, 13, 20
       \end{frame}
 
 
-    \section{}
-%   \section{References}    
-    \begin{frame}[t,allowframebreaks]\label{lastframe}
-        \frametitle{bibliography}
-          \nocite{*}
-        \bibliographystyle{ans}
-        % make a bibliography.bib file with your references in it
-        \bibliography{bibliography}
-    \end{frame}
+%     \section{}
+% %   \section{References}    
+%     \begin{frame}[t,allowframebreaks]\label{lastframe}
+%         \frametitle{bibliography}
+%           \nocite{*}
+%         \bibliographystyle{ans}
+%         % make a bibliography.bib file with your references in it
+%         \bibliography{bibliography}
+%     \end{frame}
+    
 \beginbackup
 \begin{frame}{Backup Slides}
 \begin{table}[bt]\begin{tabular}{|c|c|} \hline\textbf{POD}& \textbf{DMD}   \\ \hline 
