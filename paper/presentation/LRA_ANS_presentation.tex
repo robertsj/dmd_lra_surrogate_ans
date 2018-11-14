@@ -236,14 +236,14 @@ Suppose one makes successive measurements spaced by $\Delta t$ that lead to the 
 \begin{equation*}
 \mathbf{Y_0}=\left[\begin{array}{ccc}
 | & |   & | \\
-{\vec{y_0}} &   ... & {\vec{y_{m-1}}} \\ 
+{\vec{y_0}} &   ... & {\vec{y_{n-1}}} \\ 
 | & | &  | 
 \end{array} \right] 
  \,\, \text{and} \quad
 {\mathbf{Y_1}}=
 \left[\begin{array}{ccc}
 | & |  & | \\ 
-{\vec{y_1}} & ... & {\vec{y_{m}}} \\ 
+{\vec{y_1}} & ... & {\vec{y_{n}}} \\ 
 | & |  & |
 \end{array} \right]\, .
 \end{equation*}
@@ -266,7 +266,7 @@ Here, we seek the {\it finite} operator $\mathbf{A}$ that best satisfies
 Specifically, seek $\mathbf{A}$ that fits the data in a least-squares sense, or 
 
 \begin{equation*}
-\mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{X_{2}} -\mathbf{AX_{1}}\|_F \quad \longrightarrow \quad \mathbf{A}\approx\mathbf{X_2}\mathbf{X_1^{\dagger}} \, .
+\mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{Y_{1}} -\mathbf{AY_{0}}\|_F = \mathbf{Y_1}\mathbf{Y_0^{+}} \, .
 \end{equation*}
 
 \vfill 
@@ -284,7 +284,7 @@ In practice, $\mathbf{A}$  is very large, so DMD uses a low-rank approximation b
  
 The SVD is exploited to reveal the low dimensional structure in the data by keeping the first $r$ singular values that recovers most of the data variance, i.e.,
 \begin{equation*}
- \mathbf{X_1} \approx \mathbf{U_r}\boldsymbol{\Sigma}_{\mathbf{r}}\mathbf{V_r^{H}} \, .
+ \mathbf{Y_0} \approx \mathbf{U_r}\boldsymbol{\Sigma}_{\mathbf{r}}\mathbf{V_r^{H}} \, .
 \end{equation*}
 
 
@@ -295,39 +295,39 @@ The columns of {$\mathbf{U_r}$} are the {\bf POD} modes onto which the data will
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}
-\frametitle{DMD Surrogate}
+\frametitle{Basic DMD Algorithm}
 
-{\bf The Algorithm}
+Starting with SVD of $\mathbf{Y}_0$, do
 \begin{enumerate}
  \pause
  \item 
- \begin{tabular}{p{5cm}r}
-  $\mathbf{U_r^{H}X_2} \approx \underbrace{\mathbf{U_r^{H} A U_r}}_{\tilde{\mathbf{A}}}\boldsymbol{\Sigma}\mathbf{_r}\mathbf{V_r^{H}}.$
+ \begin{tabular}{p{6cm}r}
+  $\mathbf{U_r^{H}Y_1} = \mathbf{U_r^H}\mathbf{A}\mathbf{Y_0} =  \underbrace{\mathbf{U_r^{H} A U_r}}_{\tilde{\mathbf{A}}}\boldsymbol{\Sigma}\mathbf{_r}\mathbf{V_r^{H}}.$
     &  \pause $\mathbf{A}$ and $\mathbf{\tilde{A}}$ are similar. \\
  \end{tabular}
  \pause
  \item 
  \begin{tabular}{p{5cm}r}
-  $\mathbf{\tilde{A}}=\mathbf{U_r^{H}X_2}\mathbf{V_r}\boldsymbol{\Sigma}_{\mathbf{r}}^{-1}.$
-    &  \pause  Compute  $\mathbf{\tilde{A}}$. \\
+  $\mathbf{\tilde{A}}=\mathbf{U_r^{H}Y_1}\mathbf{V_r}\boldsymbol{\Sigma}_{\mathbf{r}}^{-1}.$
+    &   \\
  \end{tabular}
  \pause
  \item 
  \begin{tabular}{p{5cm}r}
    $\mathbf{\tilde{A} \tilde{W}}=\mathbf{\tilde{W}}\boldsymbol{\Lambda}$ 
-    &  \pause Eigendecomposition of $\mathbf{\tilde{A}}$. \\
+    &    \\
  \end{tabular}
  \pause
  \item 
  \begin{tabular}{p{5cm}r}
     $\omega_i= \text{log}(\lambda_i)/\Delta t.$
-    &  \pause Discrete to continuous.\\
+    &  \pause discrete to continuous \\
  \end{tabular}
  \pause
  \item 
  \begin{tabular}{p{5cm}r}
-   ${\boldsymbol{\Phi}}^{DMD}={\mathbf{X_2V_r}}\boldsymbol{\Sigma}_\mathbf{r}^{-1}{\mathbf{\tilde{W}}}.$
-    &  \pause The DMD modes. \\
+   ${\boldsymbol{\Phi}}={\mathbf{Y_1 V_r}}\boldsymbol{\Sigma}_\mathbf{r}^{-1}{\mathbf{\tilde{W}}}.$
+    &  \pause the ``DMD modes'' \\
  \end{tabular}
 %  \item 
 %  \begin{tabular}{lr}
@@ -336,71 +336,60 @@ The columns of {$\mathbf{U_r}$} are the {\bf POD} modes onto which the data will
 %  \end{tabular}
 \end{enumerate}
 
-% \begin{block}{The Algorithm}
-% \begin{columns}[c]
-% \begin{column}{0.45\textwidth}
-% 
-% \begin{itemize}
-% \item\onslide<1->$\mathbf{U_r^{H}X_2} \approx \underbrace{\mathbf{U_r^{H} A U_r}}_{\tilde{\mathbf{A}}}\boldsymbol{\Sigma}\mathbf{_r}\mathbf{V_r^{H}}.$
-% \item\onslide<2->$\mathbf{\tilde{A}}=\mathbf{U_r^{H}X_2}\mathbf{V_r}\boldsymbol{\Sigma}_{\mathbf{r}}^{-1}.$\pause
-% \item\onslide<3->
-%  $\mathbf{\tilde{A} \tilde{W}}=\mathbf{\tilde{W}}\boldsymbol{\Lambda}$ \pause
-% \item\onslide<4-> $\omega_i= \text{log}(\lambda_i)/\Delta t.$
-% \item\onslide<5-> ${\boldsymbol{\Phi}}^{DMD}={\mathbf{X_2V_r}}\boldsymbol{\Sigma}_\mathbf{r}^{-1}{\mathbf{\tilde{W}}}.$
-% 
-%  \end{itemize}
-% %\end{block}
-% \end{column}
-
-% \begin{column}{0.45\textwidth}
-% %\begin{block}{}
-% \begin{itemize}
-% \item\onslide<1-> $\mathbf{A}$ and $\mathbf{\tilde{A}}$ are similar.\vspace{1cm}
-% \item\onslide<2-> Compute  $\mathbf{\tilde{A}}$.
-% \item\onslide<3-> Eigendecomposition of $\mathbf{\tilde{A}}$.
-% \item\onslide<4-> Discrete to continuous.
-% \item\onslide<5-> The DMD modes.
-% \end{itemize}
-% \end{column}
-% \end{columns}
+% \pause
+% \begin{block}{The surrogate}
+% $\vec{y}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i e^{\omega_it}={{\boldsymbol{\Phi}}} \, {\textrm{diag}}(e^{\vec{\omega}t})\vec{b}$
 % \end{block}
-% \onslide<6->
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Reconstruction and the Surrogate}
+
+Given $\mathbf{\phi}$ and $w_i$, define the DMD surrogate
+\begin{equation*}
+ \vec{y}^{DMD}(t)\approx \sum_{i=1}^{r} \textcolor{blue}{b}_i \boldsymbol{\phi}_i e^{\omega_it}={{\boldsymbol{\Phi}}} \, {\textrm{diag}}(e^{\vec{\omega}t})\vec{\textcolor{blue}{b}} \, ,
+\end{equation*}
+but what about $\mathbf{b}$?
+
+
+\vfill 
 \pause
-\begin{block}{The surrogate}
-$\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_it}={{\boldsymbol{\Phi}}}^{DMD}{\mathbf{diag}}(e^{\vec{\omega}t})\vec{b}$
-\end{block}
+
+The (maybe) obvious definition: $\mathbf{b} = \boldsymbol{\Phi}^+ \mathbf{y}_0$.
+
+\vfill 
+\pause 
+
+Other options: set $\mathbf{b}$ to minimize $||\mathbf{Y}^{DMD} - \mathbf{Y}||_F$ or the method by Jovanovic {\it et al}.
+
+
+\vfill
 
 \end{frame}
 
 \begin{frame}
-\begin{block}{mode contribution (amplitudes)}
-%\begin{itemize}
-%\item$\vec{b}=\boldsymbol{\Phi}^{DMD\dagger}\vec{x_0}.$
-%\item $\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\mathbf{X_{1}} -\boldsymbol{\Phi}^{DMD}\mathbf{D}_b\mathbf{V}_{and}\|_F $.
-%\item$\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\boldsymbol{\Sigma_r}\mathbf{V^{H}} -\mathbf{\tilde{W}}\mathbf{D}_b\mathbf{V}_{and}\|_F.$
-%\item $\vec{b}_{opt}=\left( (\mathbf{\tilde{W}^H}\mathbf\tilde{{W}})\circ( \overline{\mathbf{V}_{and}\mathbf{V}_{and}^{H}})\right)^{-1}\overline{diag(\mathbf{V}_{and}\mathbf{V}\boldsymbol{\Sigma}^{H}\mathbf{\tilde{W}})}$.
-%\end{itemize}
-\end{block}
-\end{frame}
+\frametitle{Partitioned DMD}
 
-\begin{frame}
-\begin{block}{Partitioned DMD}
-\begin{itemize}
-\item modes are \textbf{non-orthogonal}, increasing the rank does not necessarily enhance accuracy. 
-\item In highly transient problems, what if there were modes that were important for while but disappeared after that?
-\item what if some interval required a certain rank where dynamics evolved slowly, but another required the full rank to capture the rapid evolution?
-\item can we use multiple sequential surrogates, with multiple ranks and maybe different amplitudes?
-\item This is the basic idea of Partitioned DMD.
-\end{itemize}
-\end{block}
-\end{frame}
 
-\begin{frame}
-\begin{block}{Partitioned DMD}
-\begin{itemize}
-\item  The premise of Partitioned DMD is that it allows for scanning each time window for a sense of the time scale at which dynamics are evolving and hence select iteratively the number/location of partitions, proper rank, and mode contributions for each partition.  
-\end{itemize}
-\end{block}
+Basic DMD does poorly for large transients, and adding modes (non-orthogonal) not guaranteed to increase accuracy.
+
+\vfill 
+\pause
+
+A potential solution: {\bf define time partitions each with its own surrogate and feed output of one to the next}.
+
+\vfill 
+\pause
+
+Here, all partitioning is {\it ad hoc}, but variable that could be formally optimized include
+\begin{enumerate}
+ \item number of partitions
+ \item partition boundaries
+ \item partition rank (i.e., how many modes in each)
+ \item mode amplitudes
+\end{enumerate}
+
 \end{frame}
 
 
