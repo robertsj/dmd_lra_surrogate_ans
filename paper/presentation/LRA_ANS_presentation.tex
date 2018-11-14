@@ -63,6 +63,9 @@
 \newcommand{\ud}{\mathop{}\!\mathrm{d}} % upright derivative symbol
 \graphicspath{{../../data/images/}}
 
+\usepackage{etoolbox}
+\AtBeginEnvironment{quote}{\singlespacing\small}
+
 \usetikzlibrary{arrows,shapes}
 \usetikzlibrary{decorations.pathreplacing,matrix, positioning}
 \setlength\intextsep{1\baselineskip plus 3pt minus 2 pt}
@@ -124,29 +127,306 @@ Dr. Mohammad Abdo \\
     \end{frame}
     
 
-    \section{Background and Motivation}
+\section{Background and Motivation}
     
-    \begin{frame}
-        \frametitle{LRA Benchmark: Laboratorium f{\"u}r Reaktorregelung und Anlagensicherung}       
+    
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{A Need for Uncertainty Quantification of Transients}       
+
+\vfill
+
+Growing interest in transient phenomena have led to new experiments and renewed capabilities:
+\pause
 \begin{itemize}
-       \item 2D LRA benchmark is a 2-group, quarter-core BWR.
-       \item Simplicity of the geometry renders the problem tractable personal computers
-   
-       \item  It was used to test modern neutronics codes.
-%         
-    \item assemply homogenized cross section data
+ \item multiple fission chambers deployed in UWNR for a variety of  steady-state and transient reaction-rate measurements
+ \pause 
+ \item recent restart of TREAT is already generating new core data, with much more to follow.
+\end{itemize}
+
+\vfill 
+\pause 
+
+Analysis of experiments may required the use of advanced tools (e.g., MAMMOTH/Rattlesnake + other creatures)
+
+\pause 
+\vfill
+
+{\bf ...but what's the uncertainty in computed results?}
+ 
+\pause 
+\vfill
+
+Possible options:
+\begin{itemize}
+ \item brute-force sampling (expensive)
+ \item {\bf reduced order modeling (cheap)}
+\end{itemize}
+ 
+\vfill
+ 
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
     
+\frametitle{Reduced Order Modeling}
+
+Main idea: Let
+\begin{equation*}
+ \vec{f}(\vec{x})\approx \vec{g}(\mathcal{M}(\vec{x}))
+\end{equation*}
+where $\vec{x} \subseteq \mathbb{R}^n$, $\mathcal{M}(\vec{x}) \in \mathbb{R}^{r_x}$ and $r_x \ll n$.
+
+\pause
+\vfill
+
+A large class of approximations projects underlying model onto basis (think proper-orthogonal decomposition or POD).
+
+\pause
+\vfill 
+
+Present goal is a completely data-driven surrogate based on Dynamic Mode Decomposition (DMD).
+
+\end{frame}
+
+
+\section{Dynamic Mode Decomposition}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{DMD Overview}
+
+
+DMD was first used to analyze fluid dynamics experiments (P.J. Schmid, J. Fluid Mech. {\bf 656}), and most recent advanced summarized in a recent monograph (N. Kutz {\it et al.}, SIAM).
+
+\pause
+\vfill
+
+Some scoping work in nuclear with applications of DMD to:
+\begin{itemize}
+ \item modeling nuclide evolution (Abdo {\it et al.})
+ \item decay heat generation (Alfonsi, {\it et al.})
+\end{itemize}
+Maybe others?
+
+% \begin {itemize}
+% \item DMD first used by Schmid in 2008, in fluid dynamics \cite{schmid08}.
+% \item It is used to explore the behavior of dynamical systems.\footnote{lalal}
+% \item  It can be viewed as a PCA (spatial domain) + DFT (frequency domain).
+% % \item  It can be viewed as a combination of a PCA in the spatial domain and Discrete Fourier Transform (DFT) in the frequency domain.
+% 
+% \end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle {DMD Methodology}
+
+Consider a dynamical system described by $\frac{d\mathbf{y}}{dt} = \mathbf{f}(\mathbf{y}, t)$. 
+
+\vfill 
+\pause
+
+Suppose one makes successive measurements spaced by $\Delta t$ that lead to the $m\times n$ matrices
+
+\begin{equation*}
+\mathbf{Y_0}=\left[\begin{array}{ccc}
+| & |   & | \\
+{\vec{y_0}} &   ... & {\vec{y_{m-1}}} \\ 
+| & | &  | 
+\end{array} \right] 
+ \,\, \text{and} \quad
+{\mathbf{Y_1}}=
+\left[\begin{array}{ccc}
+| & |  & | \\ 
+{\vec{y_1}} & ... & {\vec{y_{m}}} \\ 
+| & |  & |
+\end{array} \right]\, .
+\end{equation*}
+
+\vfill 
+\pause
+
+Koopman once showed there is an infinite-dimensional $\mathcal{A}$ that maps $\mathbf{y}_{i}$ to $\mathbf{y}_{i+1}$.  
+Here, we seek the {\it finite} operator $\mathbf{A}$ that best satisfies
+\begin{equation*}
+   \mathbf{Y_1} \approx \mathbf{A} \mathbf{Y_0} \, .
+\end{equation*}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{DMD Methodology}
+
+Specifically, seek $\mathbf{A}$ that fits the data in a least-squares sense, or 
+
+\begin{equation*}
+\mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{X_{2}} -\mathbf{AX_{1}}\|_F \quad \longrightarrow \quad \mathbf{A}\approx\mathbf{X_2}\mathbf{X_1^{\dagger}} \, .
+\end{equation*}
+
+\vfill 
+\pause
+ 
+In practice, $\mathbf{A}$  is very large, so DMD uses a low-rank approximation based on the singular value decomposition (SVD).
+\vfill
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Singular Value Decomposition}
+
+ 
+The SVD is exploited to reveal the low dimensional structure in the data by keeping the first $r$ singular values that recovers most of the data variance, i.e.,
+\begin{equation*}
+ \mathbf{X_1} \approx \mathbf{U_r}\boldsymbol{\Sigma}_{\mathbf{r}}\mathbf{V_r^{H}} \, .
+\end{equation*}
+
+
+The columns of {$\mathbf{U_r}$} are the {\bf POD} modes onto which the data will be projected.  
+
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{DMD Surrogate}
+
+{\bf The Algorithm}
+\begin{enumerate}
+ \pause
+ \item 
+ \begin{tabular}{p{5cm}r}
+  $\mathbf{U_r^{H}X_2} \approx \underbrace{\mathbf{U_r^{H} A U_r}}_{\tilde{\mathbf{A}}}\boldsymbol{\Sigma}\mathbf{_r}\mathbf{V_r^{H}}.$
+    &  \pause $\mathbf{A}$ and $\mathbf{\tilde{A}}$ are similar. \\
+ \end{tabular}
+ \pause
+ \item 
+ \begin{tabular}{p{5cm}r}
+  $\mathbf{\tilde{A}}=\mathbf{U_r^{H}X_2}\mathbf{V_r}\boldsymbol{\Sigma}_{\mathbf{r}}^{-1}.$
+    &  \pause  Compute  $\mathbf{\tilde{A}}$. \\
+ \end{tabular}
+ \pause
+ \item 
+ \begin{tabular}{p{5cm}r}
+   $\mathbf{\tilde{A} \tilde{W}}=\mathbf{\tilde{W}}\boldsymbol{\Lambda}$ 
+    &  \pause Eigendecomposition of $\mathbf{\tilde{A}}$. \\
+ \end{tabular}
+ \pause
+ \item 
+ \begin{tabular}{p{5cm}r}
+    $\omega_i= \text{log}(\lambda_i)/\Delta t.$
+    &  \pause Discrete to continuous.\\
+ \end{tabular}
+ \pause
+ \item 
+ \begin{tabular}{p{5cm}r}
+   ${\boldsymbol{\Phi}}^{DMD}={\mathbf{X_2V_r}}\boldsymbol{\Sigma}_\mathbf{r}^{-1}{\mathbf{\tilde{W}}}.$
+    &  \pause The DMD modes. \\
+ \end{tabular}
+%  \item 
+%  \begin{tabular}{lr}
+%   $\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_it}={{\boldsymbol{\Phi}}}^{DMD}{\mathbf{diag}}(e^{\vec{\omega}t})\vec{b}$
+%     &  \pause The surrogate \\
+%  \end{tabular}
+\end{enumerate}
+
+% \begin{block}{The Algorithm}
+% \begin{columns}[c]
+% \begin{column}{0.45\textwidth}
+% 
+% \begin{itemize}
+% \item\onslide<1->$\mathbf{U_r^{H}X_2} \approx \underbrace{\mathbf{U_r^{H} A U_r}}_{\tilde{\mathbf{A}}}\boldsymbol{\Sigma}\mathbf{_r}\mathbf{V_r^{H}}.$
+% \item\onslide<2->$\mathbf{\tilde{A}}=\mathbf{U_r^{H}X_2}\mathbf{V_r}\boldsymbol{\Sigma}_{\mathbf{r}}^{-1}.$\pause
+% \item\onslide<3->
+%  $\mathbf{\tilde{A} \tilde{W}}=\mathbf{\tilde{W}}\boldsymbol{\Lambda}$ \pause
+% \item\onslide<4-> $\omega_i= \text{log}(\lambda_i)/\Delta t.$
+% \item\onslide<5-> ${\boldsymbol{\Phi}}^{DMD}={\mathbf{X_2V_r}}\boldsymbol{\Sigma}_\mathbf{r}^{-1}{\mathbf{\tilde{W}}}.$
+% 
+%  \end{itemize}
+% %\end{block}
+% \end{column}
+
+% \begin{column}{0.45\textwidth}
+% %\begin{block}{}
+% \begin{itemize}
+% \item\onslide<1-> $\mathbf{A}$ and $\mathbf{\tilde{A}}$ are similar.\vspace{1cm}
+% \item\onslide<2-> Compute  $\mathbf{\tilde{A}}$.
+% \item\onslide<3-> Eigendecomposition of $\mathbf{\tilde{A}}$.
+% \item\onslide<4-> Discrete to continuous.
+% \item\onslide<5-> The DMD modes.
+% \end{itemize}
+% \end{column}
+% \end{columns}
+% \end{block}
+% \onslide<6->
+\pause
+\begin{block}{The surrogate}
+$\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_it}={{\boldsymbol{\Phi}}}^{DMD}{\mathbf{diag}}(e^{\vec{\omega}t})\vec{b}$
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+\begin{block}{mode contribution (amplitudes)}
+%\begin{itemize}
+%\item$\vec{b}=\boldsymbol{\Phi}^{DMD\dagger}\vec{x_0}.$
+%\item $\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\mathbf{X_{1}} -\boldsymbol{\Phi}^{DMD}\mathbf{D}_b\mathbf{V}_{and}\|_F $.
+%\item$\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\boldsymbol{\Sigma_r}\mathbf{V^{H}} -\mathbf{\tilde{W}}\mathbf{D}_b\mathbf{V}_{and}\|_F.$
+%\item $\vec{b}_{opt}=\left( (\mathbf{\tilde{W}^H}\mathbf\tilde{{W}})\circ( \overline{\mathbf{V}_{and}\mathbf{V}_{and}^{H}})\right)^{-1}\overline{diag(\mathbf{V}_{and}\mathbf{V}\boldsymbol{\Sigma}^{H}\mathbf{\tilde{W}})}$.
+%\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Partitioned DMD}
+\begin{itemize}
+\item modes are \textbf{non-orthogonal}, increasing the rank does not necessarily enhance accuracy. 
+\item In highly transient problems, what if there were modes that were important for while but disappeared after that?
+\item what if some interval required a certain rank where dynamics evolved slowly, but another required the full rank to capture the rapid evolution?
+\item can we use multiple sequential surrogates, with multiple ranks and maybe different amplitudes?
+\item This is the basic idea of Partitioned DMD.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\begin{frame}
+\begin{block}{Partitioned DMD}
+\begin{itemize}
+\item  The premise of Partitioned DMD is that it allows for scanning each time window for a sense of the time scale at which dynamics are evolving and hence select iteratively the number/location of partitions, proper rank, and mode contributions for each partition.  
+\end{itemize}
+\end{block}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+
+\frametitle{LRA Benchmark: Laboratorium f{\"u}r Reaktorregelung und Anlagensicherung}       
+
+\begin{itemize}
+  \item 2D LRA benchmark is a 2-group, quarter-core BWR.
+  \item Simplicity of the geometry renders the problem tractable personal computers
+  \item  It was used to test modern neutronics codes.        
+    \item assemply homogenized cross section data
     \item ramp absorption cross section is simulation control rod ejection
     \item Originally posed as a diffusion problem, solved with coarse mesh and nodel diffusion methods.
     \item Scruntinizes the reactivity insertion accedent. 
        
-  
-       \end{itemize}
-    \end{frame}
+\end{itemize}
+
+\end{frame}
 
     
-    \begin{frame}
-        \frametitle{DETRAN:}       
+\begin{frame}
+
+\frametitle{DETRAN:}       
 \begin{itemize}
        \item A DEterministic TRANsport code originally developed by Jermey Roberts.
        \item It utilizes methods such as Multigroup diffusion, discrete ordinates, MOC.
@@ -158,24 +438,7 @@ Dr. Mohammad Abdo \\
        \end{itemize}
     \end{frame}
 
-   % \section{Reduced Order Models} % new section title
-    \begin{frame}
-    \frametitle{Reduced Order Modeling}
 
-    \begin{itemize}
-    %\item Reduced order models are approximation of the original expensive model, that could represent the model in terms of a lower number of inputs.
-   \begin{block}{ROM}
-%\begin{equation*}
-\centering
-$\vec{f}(\vec{x})\approx \vec{g}(\mathcal{M}(\vec{x})); \ \ \vec{x} \subseteq \mathbb{R}^n, \mathcal{M}(\vec{x}) \in \mathbb{R}^{r_x}; r_x << n$
-%    \end{equation*}
-\end{block}
-
-    \item This is usually done by projecting the problem high dimensional space onto a lower space that captures most of the data variance (i.e POD).
-    
-    \item In this work, Dynamic Mode Decomposition (DMD) was used to construct a data-driven surrogate model. 
-    \end{itemize}
-    \end{frame}
     \section{Actual Model Description}
 
     \begin{frame}
@@ -303,133 +566,7 @@ P(\vec{x},t)=\varepsilon [\Sigma_{f1}(\vec{x},t)\phi_1(\vec{x},t)+\Sigma_{f2}(\v
 % * <mgabdo@ksu.edu> 2018-03-28T13:53:50.537Z:
 %
 % ^.
-\section{Dynamic Mode Decomposition}
-\begin{frame}
-\frametitle{DMD Overview}
-\begin {itemize}
-\item DMD was first used by Schmid in 2008, in fluid dynamics \cite{schmid08}.
-\item It is used to explore the behavior of dynamical systems.
-\item  It can be viewed as a PCA (spatial domain) + DFT (frequency domain).
-% \item  It can be viewed as a combination of a PCA in the spatial domain and Discrete Fourier Transform (DFT) in the frequency domain.
 
-\end{itemize}
-\end{frame}
-\begin{frame}
-\frametitle {DMD Methodology}
-Consider a sequential dataset ($\mathbf{X} \subseteq \mathbb{R}^{n\times m}$) spaced by $\Delta t$.
-     \begin{figure}[!htb]
-     \centering
-  \includegraphics[scale=0.29]{DATA.png}
-  \label{fig:data_matrix}
-\end{figure} 
-\begin{block}{}
-\small{\textbf{Assumption}: With sufficiently small $\Delta t$, there is a linear time marching operator $\mathbf{A}$ that approximates the system's dynamic, such that;} 
-\centering
-$
-         \mathbf{X_2} \approx  \tikz[baseline]{\node[draw=purple,anchor=base,
-circle,inner xsep=-2pt,inner ysep=3pt] {$\mathbf{A}$}} \mathbf{X_1}
-$
-
-\end{block}
-\end{frame}
-
-\begin{frame}
-\frametitle{DMD Methodology}
-\begin{block}{}
-$\mathbf{A}$ is the operator that best fits the data in a least-squares sense;
-\centering
-$\mathbf{A}=\argmin\limits_{\mathbf{A}}\|\mathbf{X_{2}} -\mathbf{AX_{1}}\|_F \, ,
-$\\
-${\mathbf{A}\approx\mathbf{X_2}\mathbf{X_1^{\dagger}}} $
-\end{block}
-\begin{block}{}
-In practice, $\mathbf{A}$  is very large $\to$ DMD tries to approximate its eigenpairs.
-\end{block}
-\begin{block}{}
-The Singular Value Decomposition(\textbf{SVD}) is computed for $\mathbf{X_1}$;
-\centering
-${\mathbf{X_1} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V^{H}} }$
-\end{block}
-\end{frame}
-
-  \begin{frame}
-  \frametitle{Singular Value Decomposition}
-\begin{block}{}
-The SVD is exploited to reveal the low dimensional structure in the data by keeping the first r singular values that recovers most of the data variance;\\
-\centering
-${\mathbf{X_1} \approx \mathbf{U_r}\boldsymbol{\Sigma}_{\mathbf{r}}\mathbf{V_r^{H}} }$
-\end{block}
-\begin{block}{}
-The columns of {$\mathbf{U_r}$} are the \textbf{POD}  modes onto which the data will be projected.  
-\end{block}
-    \end{frame}
-
-\begin{frame}
-\frametitle{DMD Surrogate}
-\begin{block}{The Algorithm}
-\begin{columns}[c]
-\begin{column}{0.45\textwidth}
-
-\begin{itemize}
-\item\onslide<1->$\mathbf{U_r^{H}X_2} \approx \underbrace{\mathbf{U_r^{H} A U_r}}_{\tilde{\mathbf{A}}}\boldsymbol{\Sigma}\mathbf{_r}\mathbf{V_r^{H}}.$
-\item\onslide<2->$\mathbf{\tilde{A}}=\mathbf{U_r^{H}X_2}\mathbf{V_r}\boldsymbol{\Sigma}_{\mathbf{r}}^{-1}.$\pause
-\item\onslide<3->
- $\mathbf{\tilde{A} \tilde{W}}=\mathbf{\tilde{W}}\boldsymbol{\Lambda}$ \pause
-\item\onslide<4-> $\omega_i= \text{log}(\lambda_i)/\Delta t.$
-\item\onslide<5-> ${\boldsymbol{\Phi}}^{DMD}={\mathbf{X_2V_r}}\boldsymbol{\Sigma}_\mathbf{r}^{-1}{\mathbf{\tilde{W}}}.$
-
- \end{itemize}
-%\end{block}
-\end{column}
-
-\begin{column}{0.45\textwidth}
-%\begin{block}{}
-\begin{itemize}
-\item\onslide<1-> $\mathbf{A}$ and $\mathbf{\tilde{A}}$ are similar.\vspace{1cm}
-\item\onslide<2-> Compute  $\mathbf{\tilde{A}}$.
-\item\onslide<3-> Eigendecomposition of $\mathbf{\tilde{A}}$.
-\item\onslide<4-> Discrete to continuous.
-\item\onslide<5-> The DMD modes.
-\end{itemize}
-\end{column}
-\end{columns}
-\end{block}
-\onslide<6->
-\begin{block}{The surrogate}
-$\vec{x}^{DMD}(t)\approx \sum_{i=1}^{r} b_i \boldsymbol{\phi}_i^{DMD} e^{\omega_it}={{\boldsymbol{\Phi}}}^{DMD}{\mathbf{diag}}(e^{\vec{\omega}t})\vec{b}$
-\end{block}
-\end{frame}
-
-\begin{frame}
-\begin{block}{mode contribution (amplitudes)}
-\begin{itemize}
-\item$\vec{b}=\boldsymbol{\Phi}^{DMD\dagger}\vec{x_0}.$
-\item $\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\mathbf{X_{1}} -\boldsymbol{\Phi}^{DMD}\mathbf{D}_b\mathbf{V}_{and}\|_F $.
-\item$\vec{b}_{opt}=\argmin\limits_{\vec{b}}\|\boldsymbol{\Sigma_r}\mathbf{V^{H}} -\mathbf{\tilde{W}}\mathbf{D}_b\mathbf{V}_{and}\|_F.$
-\item $\vec{b}_{opt}=\left( (\mathbf{\tilde{W}^H}\mathbf\tilde{{W}})\circ( \overline{\mathbf{V}_{and}\mathbf{V}_{and}^{H}})\right)^{-1}\overline{diag(\mathbf{V}_{and}\mathbf{V}\boldsymbol{\Sigma}^{H}\mathbf{\tilde{W}})}$.
-\end{itemize}
-\end{block}
-\end{frame}
-
-\begin{frame}
-\begin{block}{Partitioned DMD}
-\begin{itemize}
-\item modes are \textbf{non-orthogonal}, increasing the rank does not necessarily enhance accuracy. 
-\item In highly transient problems, what if there were modes that were important for while but disappeared after that?
-\item what if some interval required a certain rank where dynamics evolved slowly, but another required the full rank to capture the rapid evolution?
-\item can we use multiple sequential surrogates, with multiple ranks and maybe different amplitudes?
-\item This is the basic idea of Partitioned DMD.
-\end{itemize}
-\end{block}
-\end{frame}
-
-\begin{frame}
-\begin{block}{Partitioned DMD}
-\begin{itemize}
-\item  The premise of Partitioned DMD is that it allows for scanning each time window for a sense of the time scale at which dynamics are evolving and hence select iteratively the number/location of partitions, proper rank, and mode contributions for each partition.  
-\end{itemize}
-\end{block}
-\end{frame}
 
 
 \section{Numerical Experiments and Results}
