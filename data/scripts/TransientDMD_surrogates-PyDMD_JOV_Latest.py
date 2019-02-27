@@ -23,7 +23,8 @@ import os
 import time
 # In[32]:
 
-do_sensitivity = False
+do_sensitivity = True
+rel_err = False
 
 import matplotlib.pyplot as plt
 
@@ -98,7 +99,6 @@ plt.savefig('../images/HF_Power.pdf')
 
 # In[35]:
 
-
 #%%  DMD analysis
 
 def perform_dmd_analysis(t,r=[10,13,20],optimal=['Jov',False,False],time_interval = [1.36,1.5,max(t)]):
@@ -143,18 +143,18 @@ def perform_dmd_analysis(t,r=[10,13,20],optimal=['Jov',False,False],time_interva
 def rank_sensitivity_study(t,r0=[10,13,20],time_interval = [1.36,1.5,max(t)]):
     results_r0 = perform_dmd_analysis(t,r=r0, time_interval = time_interval)
     markers = ['o', '^', 's', 'v']
-    fig5=plt.figure(figsize=(15,5))
-    ax1=fig5.add_subplot(1,3,1)
-    plt.plot(t, p, 'k-', label='reference')
-    for k in range(len(time_interval)):
-        plt.plot(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
-    plt.axis([0, 3, 0, 5000])
-    plt.xlabel('t (s)')
-    plt.ylabel('power (W/cm$^3$)')
-    plt.legend(loc="upper right")
-    
+    fig5=plt.figure(figsize=(12,6))
+#    ax1=fig5.add_subplot(1,3,1)
+#    plt.plot(t, p, 'k-', label='reference')
+#    for k in range(len(time_interval)):
+#        plt.plot(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
+#    plt.axis([0, 3, 0, 5000])
+#    plt.xlabel('t (s)')
+#    plt.ylabel('power (W/cm$^3$)')
+#    plt.legend(loc="upper right")
+#    
     # Plot the surrogate and reference on a log plot.  Put the derivative on the other axis.
-    ax2=fig5.add_subplot(1,3,2)  
+    ax2=fig5.add_subplot(1,2,1)  
     plt.semilogy(t, p, 'k-', label='reference')
     for k in range(len(time_interval)):
         plt.semilogy(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))
@@ -171,7 +171,7 @@ def rank_sensitivity_study(t,r0=[10,13,20],time_interval = [1.36,1.5,max(t)]):
     #plt.legend()
     
     # Plot the error
-    ax2=fig5.add_subplot(1,3,3)  
+    ax2=fig5.add_subplot(1,2,2)  
     t_start = 0
     for k in range(len(time_interval)):
         t_end = t_start + len(results_r0[k]['t'])
@@ -288,7 +288,14 @@ xgrid,ygrid=np.meshgrid(X,Y)
 
 
 Xdmd_2D[:,:,0].shape,mp_2D[:,:,0].shape
-E = abs(mp_2D.real-Xdmd_2D.real)/mp_2D.real*100
+
+#E =  (mp_2D.real-Xdmd_2D.real)#/mp_2D.real*100
+if rel_err == True:
+    E = abs (mp_2D.real-Xdmd_2D.real)/mp_2D.real*100
+else:
+    E =  (mp_2D.real-Xdmd_2D.real)#/mp_2D.real*100
+
+
 E[mp_2D==0]=0
 
 
@@ -304,7 +311,7 @@ for i in range(len(steps)):
     print('doing ', i)
     fig = plt.figure(figsize=(15,12.75/2.5))
     ax1=fig.add_subplot(1,3, 1)
-    #ax1.set_aspect('equal')
+    ax1.set_aspect('equal')
     vmax = max(np.max(mp_2D[:,:,steps[i]]), np.max(Xdmd_2D[:,:,steps[i]].real))
     vmin = 0.0#min(np.min(mp_2D[:,:,steps[i]]>0), np.min(Xdmd_2D[:,:,steps[i]].real>0))
     plot = plt.pcolor(xgrid, ygrid, mp_2D[:,:,steps[i]].real.T,cmap=color,  
@@ -341,12 +348,81 @@ for i in range(len(steps)):
     plt.colorbar()
     plt.axis('off')
 
-    plt.title('Relative Error (\%)')
+    if rel_err == True:
+        fname = '../images/meshpower_{}.pdf'.format(i)
+        plt.title('Relative Error (\%)')
+    else:
+        fname = '../images/meshpower_{}_abs.pdf'.format(i)
+        plt.title('Absolute Error')
+
     plt.tight_layout()
-    plt.subplots_adjust(wspace=0.0, hspace=0)
+    plt.subplots_adjust(wspace=0.03, hspace=0)
 
-    fig.savefig('../images/meshpower_{}.pdf'.format(i))
+    fig.savefig(fname)
 
+#%%
+   
+
+    
+#%%
+
+res = results[0]
+b = res['dmd']._b
+e = res['eigs']
+
+plt.clf()
+for idx in range(len(b)):
+    plt.plot(res['t'], np.exp(res['t']*np.log(e[idx])*b[idx]))
+plt.show()
+#plt.legend('0123456789')
+plt.clf()
+def put_power_on_grid(v, mask, i=None):
+    X_lim = 21*7.5
+    X,Y=np.linspace(0,X_lim,22),np.linspace(0,X_lim,22)
+    xgrid,ygrid=np.meshgrid(X,Y)
+    z = np.zeros(len(mask))
+    z[mask] = v
+    z = z.reshape((22, 22))
+    plt.clf()
+    plt.axis('equal')
+    
+    plt.title(i)
+    plt.pcolor(xgrid, ygrid, z, cmap='inferno',rasterized=True, linewidth=0)
+    plt.axis([5, 135, 0, 135])
+
+    plt.colorbar()
+    plt.title("Mode {}".format(i))
+    plt.tight_layout()
+    plt.show()
+    return z
+
+
+mask = mp[:, 0]>0
+tt = 0.0
+
+ss = ''
+for i in range(10):
+  ss += ' {:.3f}  & {:.3f} & {:.1e} & {:.1e} & {:.1e}  \\\\\n'.format(e[i], 
+          np.real(np.log(e[i]))/.01, np.exp(np.real(np.log(e[i]))/.01), 
+          np.real(b[i]),  np.real(b[i])*np.exp(np.real(np.log(e[i]))/.01))
+print(ss)
+
+
+tot = 0.0
+for i in range(len(b)):
+    tmp = res['Phi'][:, i]*b[i]*np.exp(tt*np.log(e[i])/.01)
+    put_power_on_grid(tmp, mask,i)
+
+
+
+    tot += tmp
+tot = put_power_on_grid(tot, mask)
+
+
+
+
+
+#%%
 
 if do_sensitivity:
 
