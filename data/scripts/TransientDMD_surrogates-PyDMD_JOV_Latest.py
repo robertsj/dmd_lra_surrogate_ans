@@ -23,6 +23,8 @@ import os
 import time
 # In[32]:
 
+do_sensitivity = True
+rel_err = False
 
 import matplotlib.pyplot as plt
 
@@ -59,7 +61,8 @@ plt.rcParams['savefig.bbox'] = 'tight'
 
 # In[33]:
 
-
+data_file = '../inputs/diffusion2x2_ref_with_mesh_temps.p'
+data_file = '../detran/diffusion2x2.p'
 A = pickle.load(open('../inputs/diffusion2x2_ref_with_mesh_temps.p','rb'),encoding='latin')
 
 kappa = 3.204e-11
@@ -76,6 +79,9 @@ p = np.array(A['power'])# total power
 c = p[0]/sp.sum(mp,axis=0)[0]# use to reconstruct power from mesh power
 maxtemp = A['maxtemp']#
 np.where(p==max(p))
+print(max(p),  t[np.where(p==max(p))[0]])
+
+print("Max power = {:.4e} at {:.4e}".format(max(p), t[np.where(p==max(p))[0]][0]))
 #mp = mp * c
 
 plt.semilogy(t, p, 'k-')
@@ -92,7 +98,6 @@ plt.savefig('../images/HF_Power.pdf')
 # Build the surrogates using a batch of DMD's
 
 # In[35]:
-
 
 #%%  DMD analysis
 
@@ -138,18 +143,18 @@ def perform_dmd_analysis(t,r=[10,13,20],optimal=['Jov',False,False],time_interva
 def rank_sensitivity_study(t,r0=[10,13,20],time_interval = [1.36,1.5,max(t)]):
     results_r0 = perform_dmd_analysis(t,r=r0, time_interval = time_interval)
     markers = ['o', '^', 's', 'v']
-    fig5=plt.figure(figsize=(15,5))
-    ax1=fig5.add_subplot(1,3,1)
-    plt.plot(t, p, 'k-', label='reference')
-    for k in range(len(time_interval)):
-        plt.plot(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
-    plt.axis([0, 3, 0, 5000])
-    plt.xlabel('t (s)')
-    plt.ylabel('power (W/cm$^3$)')
-    plt.legend(loc="upper right")
-    
+    fig5=plt.figure(figsize=(12,6))
+#    ax1=fig5.add_subplot(1,3,1)
+#    plt.plot(t, p, 'k-', label='reference')
+#    for k in range(len(time_interval)):
+#        plt.plot(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
+#    plt.axis([0, 3, 0, 5000])
+#    plt.xlabel('t (s)')
+#    plt.ylabel('power (W/cm$^3$)')
+#    plt.legend(loc="upper right")
+#    
     # Plot the surrogate and reference on a log plot.  Put the derivative on the other axis.
-    ax2=fig5.add_subplot(1,3,2)  
+    ax2=fig5.add_subplot(1,2,1)  
     plt.semilogy(t, p, 'k-', label='reference')
     for k in range(len(time_interval)):
         plt.semilogy(results_r0[k]['t'], results_r0[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))
@@ -166,7 +171,7 @@ def rank_sensitivity_study(t,r0=[10,13,20],time_interval = [1.36,1.5,max(t)]):
     #plt.legend()
     
     # Plot the error
-    ax2=fig5.add_subplot(1,3,3)  
+    ax2=fig5.add_subplot(1,2,2)  
     t_start = 0
     for k in range(len(time_interval)):
         t_end = t_start + len(results_r0[k]['t'])
@@ -200,37 +205,28 @@ time_interval = [1.36,1.5,max(t)]
 results = perform_dmd_analysis(t) 
 markers = ['o', '^', 's', 'v']
 
-fig5=plt.figure(figsize=(15,5))
+fig5=plt.figure(figsize=(12,6))
 
 # Plot the surrogate and reference on a linear plot
-ax1=fig5.add_subplot(1,3,1)
-plt.plot(t, p, 'k-', label='reference')
-for k in range(len(time_interval)):
-    plt.plot(results[k]['t'], results[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
-plt.axis([0, 3, 0, 5000])
-plt.xlabel('t (s)')
-plt.ylabel('power (W/cm$^3$)')
-plt.legend(loc="upper right")
+#ax1=fig5.add_subplot(1,3,1)
+#plt.plot(t, p, 'k-', label='reference')
+#for k in range(len(time_interval)):
+#    plt.plot(results[k]['t'], results[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))    
+#plt.axis([0, 3, 0, 5000])
+#plt.xlabel('t (s)')
+#plt.ylabel('power (W/cm$^3$)')
+#plt.legend(loc="upper right")
 
 # Plot the surrogate and reference on a log plot.  Put the derivative on the other axis.
-ax2=fig5.add_subplot(1,3,2)  
+ax2=fig5.add_subplot(1,2,1)  
 plt.semilogy(t, p, 'k-', label='reference')
 for k in range(len(time_interval)):
     plt.semilogy(results[k]['t'], results[k]['p_dmd'].real, marker=markers[k], ls='', mfc='w', label='interval '+str(k))
 plt.xlabel('t (s)')
 plt.ylabel('power (W/cm$^3$)')
-#dpdt = np.gradient(p, t)
-#idx_pos = dpdt>0
-#idx_neg = dpdt<0
-
-#ax2left = ax2.twinx()
-#plt.semilogy(t, abs(dpdt), 'r:', label='derivative')
-#plt.legend()
-
-#plt.legend()
 
 # Plot the error
-ax2=fig5.add_subplot(1,3,3)  
+ax2=fig5.add_subplot(1,2,2)  
 t_start = 0
 for k in range(len(time_interval)):
     t_end = t_start + len(results[k]['t'])
@@ -292,7 +288,14 @@ xgrid,ygrid=np.meshgrid(X,Y)
 
 
 Xdmd_2D[:,:,0].shape,mp_2D[:,:,0].shape
-E = abs(mp_2D.real-Xdmd_2D.real)/mp_2D.real*100
+
+#E =  (mp_2D.real-Xdmd_2D.real)#/mp_2D.real*100
+if rel_err == True:
+    E = abs (mp_2D.real-Xdmd_2D.real)/mp_2D.real*100
+else:
+    E =  (mp_2D.real-Xdmd_2D.real)#/mp_2D.real*100
+
+
 E[mp_2D==0]=0
 
 
@@ -305,8 +308,9 @@ E[mp_2D==0]=0
 steps = 0, 143, 200, 300
 color = 'inferno'
 for i in range(len(steps)):
-    fig = plt.figure(figsize=(15,12.75))
-    ax1=fig.add_subplot(4,3,3*i+1)
+    print('doing ', i)
+    fig = plt.figure(figsize=(15,12.75/2.5))
+    ax1=fig.add_subplot(1,3, 1)
     ax1.set_aspect('equal')
     vmax = max(np.max(mp_2D[:,:,steps[i]]), np.max(Xdmd_2D[:,:,steps[i]].real))
     vmin = 0.0#min(np.min(mp_2D[:,:,steps[i]]>0), np.min(Xdmd_2D[:,:,steps[i]].real>0))
@@ -323,49 +327,124 @@ for i in range(len(steps)):
     plt.ylabel('t = {:.2f} s \ny (cm)'.format(t[steps[i]]))
     plt.axis([0, 135, 0, 135])
 
-    ax2=fig.add_subplot(4,3,3*i+2)
+    ax2=fig.add_subplot(1,3,2)
     ax2.set_aspect('equal')
     plt.axis([0, 135, 0, 135])
     plot=plt.pcolor(xgrid, ygrid, Xdmd_2D[:,:,steps[i]].real.T,cmap=color,  
                       vmin=0, vmax=vmax, rasterized=True, linewidth=0)
+    plt.axis('off')
+
     cbar = fig.colorbar(plot)
     cbar.formatter.set_powerlimits((0, 0))
     cbar.update_ticks()
     
     plt.title('DMD')
 
-    ax3=fig.add_subplot(4,3,3*i+3)
+    ax3=fig.add_subplot(1,3,3)
     ax3.set_aspect('equal')
     plt.axis([0, 135, 0, 135])
     plt.pcolor(xgrid, ygrid, E[:,:,steps[i]].T,cmap=color,  
                rasterized=True, linewidth=0)
     plt.colorbar()
-    
-    plt.title('Relative Error (\%)')
+    plt.axis('off')
+
+    if rel_err == True:
+        fname = '../images/meshpower_{}.pdf'.format(i)
+        plt.title('Relative Error (\%)')
+    else:
+        fname = '../images/meshpower_{}_abs.pdf'.format(i)
+        plt.title('Absolute Error')
+
     plt.tight_layout()
-    fig.savefig('../images/meshpower_{}.pdf'.format(i))
+    plt.subplots_adjust(wspace=0.03, hspace=0)
+
+    fig.savefig(fname)
+
+#%%
+   
+
+    
+#%%
+
+res = results[0]
+b = res['dmd']._b
+e = res['eigs']
+
+plt.clf()
+for idx in range(len(b)):
+    plt.plot(res['t'], np.exp(res['t']*np.log(e[idx])*b[idx]))
+plt.show()
+#plt.legend('0123456789')
+plt.clf()
+def put_power_on_grid(v, mask, i=None):
+    X_lim = 21*7.5
+    X,Y=np.linspace(0,X_lim,22),np.linspace(0,X_lim,22)
+    xgrid,ygrid=np.meshgrid(X,Y)
+    z = np.zeros(len(mask))
+    z[mask] = v
+    z = z.reshape((22, 22))
+    plt.clf()
+    plt.axis('equal')
+    
+    plt.title(i)
+    plt.pcolor(xgrid, ygrid, z, cmap='inferno',rasterized=True, linewidth=0)
+    plt.axis([5, 135, 0, 135])
+
+    plt.colorbar()
+    plt.title("Mode {}".format(i))
+    plt.tight_layout()
+    plt.show()
+    return z
+
+
+mask = mp[:, 0]>0
+tt = 0.0
+
+ss = ''
+for i in range(10):
+  ss += ' {:.3f}  & {:.3f} & {:.1e} & {:.1e} & {:.1e}  \\\\\n'.format(e[i], 
+          np.real(np.log(e[i]))/.01, np.exp(np.real(np.log(e[i]))/.01), 
+          np.real(b[i]),  np.real(b[i])*np.exp(np.real(np.log(e[i]))/.01))
+print(ss)
+
+
+tot = 0.0
+for i in range(len(b)):
+    tmp = res['Phi'][:, i]*b[i]*np.exp(tt*np.log(e[i])/.01)
+    put_power_on_grid(tmp, mask,i)
 
 
 
-rank_sensitivity_study(t,r0=[10,13,20])
+    tot += tmp
+tot = put_power_on_grid(tot, mask)
 
-rank_sensitivity_study(t,r0=[9,13,20])
-rank_sensitivity_study(t,r0=[8,13,20])
-rank_sensitivity_study(t,r0=[5,13,20])
-rank_sensitivity_study(t,r0=[11,13,20])
-rank_sensitivity_study(t,r0=[12,13,20])
 
-rank_sensitivity_study(t,r0=[10,14,20])
-rank_sensitivity_study(t,r0=[10,15,20])
-rank_sensitivity_study(t,r0=[10,12,20])
-rank_sensitivity_study(t,r0=[10,10,20])
 
-rank_sensitivity_study(t,r0=[10,13,25])
-rank_sensitivity_study(t,r0=[10,13,40])
-rank_sensitivity_study(t,r0=[10,13,100])
-rank_sensitivity_study(t,r0=[10,13,150])
 
-# time window sensitivty study
-rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.2,1.56,max(t)])
-rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.2,1.4,max(t)])
-rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.3,2.0,max(t)])
+
+#%%
+
+if do_sensitivity:
+
+  rank_sensitivity_study(t,r0=[10,13,20])
+
+  rank_sensitivity_study(t,r0=[9,13,20])
+  rank_sensitivity_study(t,r0=[8,13,20])
+  rank_sensitivity_study(t,r0=[5,13,20])
+  rank_sensitivity_study(t,r0=[11,13,20])
+  rank_sensitivity_study(t,r0=[12,13,20])
+
+  rank_sensitivity_study(t,r0=[10,14,20])
+  rank_sensitivity_study(t,r0=[10,15,20])
+  rank_sensitivity_study(t,r0=[10,12,20])
+  rank_sensitivity_study(t,r0=[10,10,20])
+
+  rank_sensitivity_study(t,r0=[10,13,25])
+  rank_sensitivity_study(t,r0=[10,13,40])
+  rank_sensitivity_study(t,r0=[10,13,100])
+  rank_sensitivity_study(t,r0=[10,13,150])
+
+  # time window sensitivty study
+  rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.2,1.56,max(t)])
+  rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.2,1.4,max(t)])
+  rank_sensitivity_study(t,r0=[10,13,20], time_interval = [1.3,2.0,max(t)])
